@@ -11,8 +11,8 @@ The Lusas Lookup Module is a Windows Forms application providing a user interfac
 
 # Usage
 1. Select a geometric object in the model
-2. Launch the dialog from the menu Modules > LusasLookup
+2. Launch the dialog from the menu `Modules` > `LusasLookup`
 
 # Installation
-1. Get "LusasLookup.dll" and "LusasLookup.LML" from Releases (or manually compile the project in Visual Studio 2019)
-2. Move both files at: %userprofile%\Documents\Lusas211\Modules
+1. Get `LusasLookup.dll` and `LusasLookup.LML` from Releases (or manually compile the project in Visual Studio 2019)
+2. Move both files at: `%userprofile%\Documents\Lusas211\Modules`
