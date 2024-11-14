@@ -88,7 +88,7 @@ namespace LusasLookup
             }
 
             // Load methods
-            string[] typesToLoad = new string[]{ "Int32", "Int64", "Double", "String" };
+            string[] typesToLoad = new string[]{ "Int32", "UInt32", "Int64", "Double", "String" };
             MethodInfo getValueNamesMethod = null;
             MethodInfo getValueMethod = null;
             foreach (var method in methods) {
@@ -118,13 +118,15 @@ namespace LusasLookup
             }
 
             // Print object saved variables
-            string[] savedValueNames = CastObject<string>.arrayFromArrayObject(getValueNamesMethod.Invoke((object)targetObjs, new object[getValueNamesMethod.GetParameters().Length]));
-            foreach (var l_name in savedValueNames) {
-                try {
-                    var value = getValueMethod.Invoke((object)targetObjs, new object[] { l_name, null });
-                    dgvObjectMethods.Rows.Add($"getValue('{l_name}')", value.GetType(), value?.ToString() ?? "null");
-                } catch {
-                    dgvObjectMethods.Rows.Add($"getValue('{l_name}')", "n/a", "error");
+            if (getValueNamesMethod != null) {
+                string[] savedValueNames = CastObject<string>.arrayFromArrayObject(getValueNamesMethod.Invoke((object)targetObjs, new object[getValueNamesMethod.GetParameters().Length]));
+                foreach (var l_name in savedValueNames) {
+                    try {
+                        var value = getValueMethod.Invoke((object)targetObjs, new object[] { l_name, null });
+                        dgvObjectMethods.Rows.Add($"getValue('{l_name}')", value.GetType(), value?.ToString() ?? "null");
+                    } catch {
+                        dgvObjectMethods.Rows.Add($"getValue('{l_name}')", "n/a", "error");
+                    }
                 }
             }
 
@@ -134,6 +136,58 @@ namespace LusasLookup
             //{
             //    dataGridView1.Rows.Add(field.Name, "", "Field");
             //}
+
+            // Add manual calculations
+            IFObjectSet objset = targetObjs as IFObjectSet;
+            if (objset != null) {
+                // Total volume
+                double vlmsVolume = CastObject<IFVolume>.arrayFromArrayObject(objset.getObjects("volume")).Select(s => s.getVolume()).DefaultIfEmpty(0).Sum();
+                dgvObjectMethods.Rows.Add("Total volumes volume", "Calculation", vlmsVolume);
+                // Total surface area
+                double surfsArea = objset.getSurfaces_Ext().Select(s => s.getArea()).DefaultIfEmpty(0).Sum();
+                dgvObjectMethods.Rows.Add("Total surfaces area", "Calculation", surfsArea);
+                // Total lines length
+                double linesLength = objset.getLines_Ext().Select(s => s.getLineLength()).DefaultIfEmpty(0).Sum();
+                dgvObjectMethods.Rows.Add("Total lines length", "Calculation", linesLength);
+
+                // Total elements volume / area / length
+                long elms3D = 0;
+                long elms2D = 0;
+                long elms1D = 0;
+                double elmsLength = 0;
+                double elmsArea = 0;
+                double elmsVolume = 0;
+                foreach (IFElement elm in objset.getElements_Ext())
+                {
+                    double l_length = elm.getLength();
+                    if (l_length > 0) {
+                        elms1D += 1;
+                        elmsLength += l_length;
+                        continue;
+                    }
+                    double l_area = elm.getArea();
+                    if (l_area > 0)
+                    {
+                        elms2D += 1;
+                        elmsArea += l_area;
+                        continue;
+                    }
+                    double l_volume = elm.getVolume();
+                    if (l_area > 0)
+                    {
+                        elms3D += 1;
+                        elmsVolume += l_volume;
+                        continue;
+                    }
+                    // It shouldn't reach this point
+                }
+                dgvObjectMethods.Rows.Add("Number of 1D elements", "Calculation", elms1D);
+                dgvObjectMethods.Rows.Add("Total length of elements", "Calculation", elmsLength);
+                dgvObjectMethods.Rows.Add("Number of 2D elements", "Calculation", elms2D);
+                dgvObjectMethods.Rows.Add("Total area of elements", "Calculation", elmsArea);
+                dgvObjectMethods.Rows.Add("Number of 3D elements", "Calculation", elms3D);
+                dgvObjectMethods.Rows.Add("Total volume of elements", "Calculation", elmsVolume);
+            }
 
             this.Cursor = Cursors.Default;
         }
