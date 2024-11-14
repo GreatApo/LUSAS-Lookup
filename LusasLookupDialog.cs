@@ -42,9 +42,13 @@ namespace LusasLookup
             // Find launch target
             long noOfSelected = m_modeller.getSelection().count("all");
             IFDatabaseMember targetObject;
-            if (noOfSelected == 0) {
-                // Nothing selected, target DB
-                targetObject = m_modeller.db();
+            if (noOfSelected == 0)
+            {
+                // Nothing selected, target Visible or DB
+                // Get visible
+                targetObject = m_modeller.getVisibleSet();
+                // If all are visible, then pass database
+                if(m_modeller.db().count("all") == ((IFObjectSet)targetObject).count("all")) targetObject = m_modeller.db();
             } else if (noOfSelected == 1) {
                 // 1 selected, target it
                 targetObject = CastObject<IFDatabaseMember>.arrayFromArrayObject(m_modeller.getSelection().getObjects("all"))[0];
