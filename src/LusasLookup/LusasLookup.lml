@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modules xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" domain="Apostolos Grammatopoulos" version="1.0.1" xmlns="urn:lusas:modules:1.0">
+  <module name="LusasLookup">
+    <assembly>
+      <path>%ModulesMachineDir%</path>
+      <file>LusasLookup.dll</file>
+      <class>LusasLookup.LusasLookupModule</class>
+    </assembly>
+    <identity>
+      <friendlyname>LusasLookup</friendlyname>
+      <description>Browse database objects and available API.</description>
+    </identity>
+    <keys />
+    <verified />
+    <options>
+      <kid>1</kid>
+    </options>
+  </module>
+</modules>

@@ -11,57 +11,94 @@
     <AssemblyName>LusasLookup</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(Platform)' == 'Win32'">
+    <OutputPath>C:\ProgramData\Lusas220\x86\Modules\</OutputPath>
+    <StartAction>Program</StartAction>
+    <StartProgram>C:\Program Files %28x86%29\LUSAS220\Programs %28x86%29\lusas_m.exe</StartProgram>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Platform)' == 'x64'">
+    <OutputPath>C:\ProgramData\Lusas220\x64\Modules\</OutputPath>
+    <StartAction>Program</StartAction>
+    <StartProgram>C:\Program Files\LUSAS220\Programs\lusas_m.exe</StartProgram>
+  </PropertyGroup>
+  <!-- Alternative OutputPath for user-specific installation
+  <PropertyGroup>
     <OutputPath>$(userprofile)\Documents\LUSAS211\Modules\</OutputPath>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|Win32' ">
-    <PlatformTarget>x86</PlatformTarget>
+  -->
+  
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|Win32' ">
-    <PlatformTarget>x86</PlatformTarget>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(Platform)' == 'Win32'">
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Platform)' == 'x64'">
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+  
   <PropertyGroup>
     <StartupObject />
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <PlatformTarget>x64</PlatformTarget>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <PlatformTarget>x64</PlatformTarget>
-  </PropertyGroup>
-  <PropertyGroup>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
     <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
     <AssemblyOriginatorKeyFile>LusasLookup.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="Common, Version=19.1.1651.39058, Culture=neutral, PublicKeyToken=5a36aca6292ce671, processorArchitecture=x86">
+  
+  <ItemGroup Condition="'$(Platform)' == 'Win32'">
+    <Reference Include="Common">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\LUSAS211\Programs (x86)\Common.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="KSharedEnum, Version=15.1.801.15975, Culture=neutral, PublicKeyToken=5a36aca6292ce671, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\LUSAS211\Programs (x86)\KSharedEnum.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Lusas.Interop, Version=20.0.1602.40900, Culture=neutral, PublicKeyToken=ee620220e102840a, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\LUSAS220\Programs (x86)\Common.dll</HintPath>
       <CopyLocal>False</CopyLocal>
       <Private>False</Private>
-      <HintPath>C:\Program Files (x86)\LUSAS211\Programs (x86)\Lusas.Interop.dll</HintPath>
     </Reference>
+    <Reference Include="KSharedEnum">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\LUSAS220\Programs (x86)\KSharedEnum.dll</HintPath>
+      <CopyLocal>False</CopyLocal>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Lusas.Interop">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\LUSAS220\Programs (x86)\Lusas.Interop.dll</HintPath>
+      <CopyLocal>False</CopyLocal>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  
+  <ItemGroup Condition="'$(Platform)' == 'x64'">
+    <Reference Include="Common">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\LUSAS220\Programs\Common.dll</HintPath>
+      <CopyLocal>False</CopyLocal>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="KSharedEnum">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\LUSAS220\Programs\KSharedEnum.dll</HintPath>
+      <CopyLocal>False</CopyLocal>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Lusas.Interop">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files\LUSAS220\Programs\Lusas.Interop.dll</HintPath>
+      <CopyLocal>False</CopyLocal>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  
+  <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -107,11 +144,11 @@
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
+  
+  <!-- Copy LML file to output directory after build -->
+  <Target Name="CopyLMLFile" AfterTargets="AfterBuild">
+    <Copy SourceFiles="$(ProjectDir)LusasLookup.lml" 
+          DestinationFolder="$(OutputPath)" 
+          SkipUnchangedFiles="true" />
   </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>
