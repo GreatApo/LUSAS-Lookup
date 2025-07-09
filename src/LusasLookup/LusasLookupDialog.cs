@@ -92,7 +92,7 @@ namespace LusasLookup
             }
 
             // Load methods
-            string[] typesToLoad = new string[]{ "Int32", "UInt32", "Int64", "Double", "String" };
+            string[] typesToLoad = new string[]{ "Int32", "UInt32", "Int64", "UInt64", "Double", "String", "Boolean" };
             MethodInfo getValueNamesMethod = null;
             MethodInfo getValueMethod = null;
             foreach (var method in methods) {
@@ -100,8 +100,10 @@ namespace LusasLookup
                 var retType = method.ReturnType.Name;
 
                 // Try to load some of the method returns
-                if (typesToLoad.Contains(retType) && !methodName.StartsWith("delete") && 
-                    !methodName.StartsWith("solve") && methodName != "showEditDlg()" &&
+                if (typesToLoad.Contains(retType) && 
+                    !methodName.StartsWith("delete") && !methodName.StartsWith("solve") && 
+                    (retType!= "Boolean" || methodName.StartsWith("is") || methodName.StartsWith("has") || methodName.StartsWith("needs")) &&
+                    methodName != "showEditDlg()" &&
                     !method.GetParameters().Any(p => !p.IsOptional)) {
                     try {
                         var value = method.Invoke(targetObjs, new object[method.GetParameters().Length]);
