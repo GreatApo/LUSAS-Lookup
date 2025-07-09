@@ -14,5 +14,10 @@ The Lusas Lookup Module is a Windows Forms application providing a user interfac
 2. Launch the dialog from the menu `Modules` > `LusasLookup`
 
 # Installation
-1. Get `LusasLookup.dll` and `LusasLookup.LML` from Releases (or manually compile the project in Visual Studio 2019)
-2. Move both files at: `%userprofile%\Documents\Lusas211\Modules`
+1. Installed LUSAS v21.1+
+  
+   If you don't have a licence, you can try LUSAS for free using an [evaluation licence](https://www.lusas.com/evaluation/index.html).
+
+   The latest LUSAS installer can be found [at the downloads section](https://www.lusas.com/user_area/download/index.html) of the official website.
+2. Download the latest `LusasLookup` release for your installed kit version. You can see the version by navigating to `Help > About LUSAS Modeller...` within LUSAS (e.g. `22.0-0c2`).
+3. Unzip the downloaded file at `LC:\ProgramData\` (or manually compile the project in Visual Studio 2019).
