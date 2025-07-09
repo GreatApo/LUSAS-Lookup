@@ -36,12 +36,13 @@ namespace LusasLookup
             this.colValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.treeView = new System.Windows.Forms.TreeView();
             this.btnHighlight = new System.Windows.Forms.Button();
-            this.lblViewObj = new System.Windows.Forms.Label();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.lblSearchTree = new System.Windows.Forms.Label();
             this.txtSearchTree = new System.Windows.Forms.TextBox();
             this.lblSearchMethods = new System.Windows.Forms.Label();
             this.txtSearchMethods = new System.Windows.Forms.TextBox();
+            this.cbValuesOnly = new System.Windows.Forms.CheckBox();
+            this.txtViewObj = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.DefaultErrorProvider)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ModuleBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvObjectMethods)).BeginInit();
@@ -95,11 +96,6 @@ namespace LusasLookup
             this.btnHighlight.UseVisualStyleBackColor = true;
             this.btnHighlight.Click += new System.EventHandler(this.btnHighlight_Click);
             // 
-            // lblViewObj
-            // 
-            resources.ApplyResources(this.lblViewObj, "lblViewObj");
-            this.lblViewObj.Name = "lblViewObj";
-            // 
             // splitContainer1
             // 
             resources.ApplyResources(this.splitContainer1, "splitContainer1");
@@ -113,11 +109,12 @@ namespace LusasLookup
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.Controls.Add(this.txtViewObj);
+            this.splitContainer1.Panel2.Controls.Add(this.cbValuesOnly);
             this.splitContainer1.Panel2.Controls.Add(this.lblSearchMethods);
             this.splitContainer1.Panel2.Controls.Add(this.txtSearchMethods);
             this.splitContainer1.Panel2.Controls.Add(this.btnHighlight);
             this.splitContainer1.Panel2.Controls.Add(this.dgvObjectMethods);
-            this.splitContainer1.Panel2.Controls.Add(this.lblViewObj);
             // 
             // lblSearchTree
             // 
@@ -139,6 +136,21 @@ namespace LusasLookup
             resources.ApplyResources(this.txtSearchMethods, "txtSearchMethods");
             this.txtSearchMethods.Name = "txtSearchMethods";
             this.txtSearchMethods.TextChanged += new System.EventHandler(this.txtSearchMethods_TextChanged);
+            // 
+            // cbValuesOnly
+            // 
+            resources.ApplyResources(this.cbValuesOnly, "cbValuesOnly");
+            this.cbValuesOnly.Name = "cbValuesOnly";
+            this.cbValuesOnly.UseVisualStyleBackColor = true;
+            this.cbValuesOnly.CheckedChanged += new System.EventHandler(this.cbValuesOnly_CheckedChanged);
+            // 
+            // txtViewObj
+            // 
+            this.txtViewObj.BackColor = System.Drawing.SystemColors.Control;
+            this.txtViewObj.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            resources.ApplyResources(this.txtViewObj, "txtViewObj");
+            this.txtViewObj.Name = "txtViewObj";
+            this.txtViewObj.ReadOnly = true;
             // 
             // LusasLookupDialog
             // 
@@ -164,7 +176,6 @@ namespace LusasLookup
         private System.Windows.Forms.DataGridView dgvObjectMethods;
         private System.Windows.Forms.TreeView treeView;
         private System.Windows.Forms.Button btnHighlight;
-        private System.Windows.Forms.Label lblViewObj;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.DataGridViewTextBoxColumn colName;
         private System.Windows.Forms.DataGridViewTextBoxColumn colType;
@@ -173,6 +184,8 @@ namespace LusasLookup
         private System.Windows.Forms.TextBox txtSearchTree;
         private System.Windows.Forms.Label lblSearchMethods;
         private System.Windows.Forms.TextBox txtSearchMethods;
+        private System.Windows.Forms.TextBox txtViewObj;
+        private System.Windows.Forms.CheckBox cbValuesOnly;
     }
 }
 

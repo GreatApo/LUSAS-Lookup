@@ -70,7 +70,7 @@ namespace LusasLookup
         {
             // Clear current table
             dgvObjectMethods.Rows.Clear();
-            lblViewObj.Text = "Loading...";
+            txtViewObj.Text = "Loading...";
             this.Cursor = Cursors.WaitCursor;
             Type type = ComTypeHelper.GetCOMObjectType(targetObjs);
             var properties = type.GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
@@ -80,9 +80,9 @@ namespace LusasLookup
             var getNameMethod = methods.FirstOrDefault(m => m.Name == "getName");
             if (getNameMethod != null) {
                 var objName = getNameMethod.Invoke(targetObjs, new object[getNameMethod.GetParameters().Length]);
-                lblViewObj.Text = $"{objName} ({type.Name})";
+                txtViewObj.Text = $"{objName} ({type.Name})";
             } else {
-                lblViewObj.Text = $"Unnamed object ({type.Name})";
+                txtViewObj.Text = $"Unnamed object ({type.Name})";
             }
 
             // Load properties
@@ -332,8 +332,17 @@ namespace LusasLookup
 
         private void filterDataGridView(DataGridView dgv, string searchTerm)
         {
+            var valuesOnly = cbValuesOnly.Checked;
+
             foreach (DataGridViewRow row in dgv.Rows)
             {
+                // Hide rows that are not values only
+                if (valuesOnly && row.Cells[2].Value.ToString() == "Method")
+                {
+                    row.Visible = false;
+                    continue;
+                }
+
                 // Check if not searching
                 if (searchTerm == "") {
                     row.Visible = true;
@@ -360,6 +369,7 @@ namespace LusasLookup
 
         #region "Events"
 
+        /// <summary>Event triggered when a node in the tree view is clicked.</summary>
         private void TreeView_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             if (e.Node.Tag == null) return;
@@ -367,12 +377,14 @@ namespace LusasLookup
             PopulateDataGridView(e.Node.Tag);
         }
 
+        /// <summary>Event triggered when the text in the search box for methods is changed.</summary>
         private void txtSearchMethods_TextChanged(object sender, EventArgs e)
         {
             string searchTerm = txtSearchMethods.Text.Trim();
             filterDataGridView(dgvObjectMethods, searchTerm);
         }
 
+        /// <summary>Event triggered when the "Select" button is clicked.</summary>
         private void btnHighlight_Click(object sender, EventArgs e)
         {
             if (treeView.SelectedNode == null) return;
@@ -397,6 +409,12 @@ namespace LusasLookup
         //        }
         //    }
         //}
+
+        /// <summary>Even triggered when the "Values Only" checkbox is checked or unchecked.</summary>
+        private void cbValuesOnly_CheckedChanged(object sender, EventArgs e) {
+            string searchTerm = txtSearchMethods.Text.Trim();
+            filterDataGridView(dgvObjectMethods, searchTerm);
+        }
 
         #endregion
 
