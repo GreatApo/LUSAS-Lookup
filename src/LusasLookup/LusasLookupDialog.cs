@@ -92,7 +92,7 @@ namespace LusasLookup
             }
 
             // Load methods
-            string[] typesToLoad = new string[]{ "Int32", "UInt32", "Int64", "UInt64", "Double", "String", "Boolean" };
+            string[] typesToLoad = new string[]{ "Int32", "UInt32", "Int64", "UInt64", "Double", "String", "Boolean", "SByte" };
             MethodInfo getValueNamesMethod = null;
             MethodInfo getValueMethod = null;
             foreach (var method in methods) {
