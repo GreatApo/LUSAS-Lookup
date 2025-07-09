@@ -127,7 +127,7 @@ namespace LusasLookup
                 foreach (var l_name in savedValueNames) {
                     try {
                         var value = getValueMethod.Invoke((object)targetObjs, new object[] { l_name, null });
-                        dgvObjectMethods.Rows.Add($"getValue('{l_name}')", value.GetType(), value?.ToString() ?? "null");
+                        dgvObjectMethods.Rows.Add($"getValue('{l_name}')", value.GetType().ToString(), value?.ToString() ?? "null");
                     } catch {
                         dgvObjectMethods.Rows.Add($"getValue('{l_name}')", "n/a", "error");
                     }
