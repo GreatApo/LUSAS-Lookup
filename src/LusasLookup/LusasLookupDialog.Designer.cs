@@ -125,6 +125,7 @@ namespace LusasLookup
             // 
             resources.ApplyResources(this.txtSearchTree, "txtSearchTree");
             this.txtSearchTree.Name = "txtSearchTree";
+            this.txtSearchTree.TextChanged += new System.EventHandler(this.txtSearchTree_TextChanged);
             // 
             // lblSearchMethods
             // 

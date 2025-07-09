@@ -5,14 +5,15 @@
 // LusasLookupDialog class implementation file
 //*******************************************************************
 
+using Lusas.Common.Extensions;
 using Lusas.LPI;
 using Lusas.Module;
+using Lusas.Utils.Interop;
 using System;
 using System.Linq;
-using System.Windows.Forms;
 using System.Reflection;
-using Lusas.Common.Extensions;
-using Lusas.Utils.Interop;
+using System.Windows.Forms;
+using System.Xml.Linq;
 
 namespace LusasLookup
 {
@@ -209,6 +210,8 @@ namespace LusasLookup
         /// <summary>Populate treeview with all database objects</summary>
         public void PopulateTreeView()
         {
+            string searchTerm = txtSearchTree.Text.Trim();
+
             // Clear the TreeView
             treeView.Nodes.Clear();
 
@@ -219,9 +222,13 @@ namespace LusasLookup
                 TreeNode l_mainNode = new TreeNode($"{l_geomName}s ({geoms.Length})");
                 treeView.Nodes.Add(l_mainNode);
 
-                foreach (var l_geom in geoms)
-                {
-                    TreeNode l_node = new TreeNode($"{l_geomName} {l_geom.getID()}");
+                foreach (var l_geom in geoms) {
+                    string l_name = $"{l_geomName} {l_geom.getID()}";
+
+                    // Skip if filtered
+                    if (searchTerm != "" && l_name.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) < 0) continue;
+
+                    TreeNode l_node = new TreeNode(l_name);
                     l_node.Tag = l_geom;
                     l_mainNode.Nodes.Add(l_node);
 
@@ -234,8 +241,7 @@ namespace LusasLookup
             IFAttribute[] attrs = CastObject<IFAttribute>.arrayFromArrayObject(m_modeller.db().getAttributes_Ext("all"));
             TreeNode attsNode = new TreeNode($"Attributes ({attrs.Length})");
             treeView.Nodes.Add(attsNode);
-            foreach (var l_attr in attrs)
-            {
+            foreach (var l_attr in attrs) {
                 string attrType = l_attr.getAttributeType();
                 TreeNode target_cat_node = null;
                 foreach (TreeNode l_cat_node in attsNode.Nodes) {
@@ -247,7 +253,12 @@ namespace LusasLookup
                     target_cat_node = new TreeNode(attrType);
                     attsNode.Nodes.Add(target_cat_node);
                 }
-                TreeNode l_node = new TreeNode(l_attr.getIDAndName());
+
+                string l_name = l_attr.getIDAndName();
+                // Skip if filtered
+                if (searchTerm != "" && l_name.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) < 0) continue;
+
+                TreeNode l_node = new TreeNode(l_name);
                 l_node.Tag = l_attr;
                 target_cat_node.Nodes.Add(l_node);
             }
@@ -256,9 +267,12 @@ namespace LusasLookup
             var analyses = m_modeller.db().getAnalyses_Ext();
             TreeNode analysesNode = new TreeNode($"Analyses ({analyses.Length})");
             treeView.Nodes.Add(analysesNode);
-            foreach (var l_analysis in analyses)
-            {
-                TreeNode l_node = new TreeNode($"{l_analysis.getName()}");
+            foreach (var l_analysis in analyses) {
+                string l_name = l_analysis.getName();
+                // Skip if filtered
+                if (searchTerm != "" && l_name.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) < 0) continue;
+
+                TreeNode l_node = new TreeNode(l_name);
                 l_node.Tag = l_analysis;
                 analysesNode.Nodes.Add(l_node);
             }
@@ -267,9 +281,12 @@ namespace LusasLookup
             var loadsets = CastObject<IFLoadset>.arrayFromArrayObject(m_modeller.db().getLoadsets("all"));
             TreeNode loadsetsNode = new TreeNode($"Loadsets ({loadsets.Length})");
             treeView.Nodes.Add(loadsetsNode);
-            foreach (var l_loadset in loadsets)
-            {
-                TreeNode l_node = new TreeNode($"{l_loadset.getIDAndName()}");
+            foreach (var l_loadset in loadsets) {
+                string l_name = l_loadset.getName();
+                // Skip if filtered
+                if (searchTerm != "" && l_name.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) < 0) continue;
+
+                TreeNode l_node = new TreeNode(l_name);
                 l_node.Tag = l_loadset;
                 loadsetsNode.Nodes.Add(l_node);
             }
@@ -278,9 +295,12 @@ namespace LusasLookup
             var groups = m_modeller.db().getGroups_Ext();
             TreeNode groupsNode = new TreeNode($"Groups ({groups.Length})");
             treeView.Nodes.Add(groupsNode);
-            foreach (var l_group in groups)
-            {
-                TreeNode l_node = new TreeNode($"{l_group.getName()}");
+            foreach (var l_group in groups) {
+                string l_name = l_group.getName();
+                // Skip if filtered
+                if (searchTerm != "" && l_name.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) < 0) continue;
+
+                TreeNode l_node = new TreeNode(l_name);
                 l_node.Tag = l_group;
                 groupsNode.Nodes.Add(l_node);
             }
@@ -330,6 +350,20 @@ namespace LusasLookup
             return "N/A";
         }
 
+        /// <summary>
+        /// Filters the rows of the specified <see cref="DataGridView"/> based on a search term and an optional
+        /// condition.
+        /// </summary>
+        /// <remarks>
+        /// Rows are hidden if they do not match the search term or, when the "Values Only"
+        /// option is enabled,  if the value in the third column is "Method". The search is case-insensitive and checks
+        /// all cells  in each row for a match.
+        /// </remarks>
+        /// <param name="dgv">The <see cref="DataGridView"/> to filter.</param>
+        /// <param name="searchTerm">
+        /// The term to search for within the cells of the <paramref name="dgv"/>.  If empty, all rows are displayed
+        /// unless filtered by other conditions.
+        /// </param>
         private void filterDataGridView(DataGridView dgv, string searchTerm)
         {
             var valuesOnly = cbValuesOnly.Checked;
@@ -377,6 +411,11 @@ namespace LusasLookup
             PopulateDataGridView(e.Node.Tag);
         }
 
+        /// <summary>Event triggered when the text in the search box for tree view is changed.</summary>
+        private void txtSearchTree_TextChanged(object sender, EventArgs e) {
+            PopulateTreeView();
+        }
+
         /// <summary>Event triggered when the text in the search box for methods is changed.</summary>
         private void txtSearchMethods_TextChanged(object sender, EventArgs e)
         {
@@ -417,6 +456,5 @@ namespace LusasLookup
         }
 
         #endregion
-
     }
 }
