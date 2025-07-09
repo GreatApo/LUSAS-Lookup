@@ -95,6 +95,7 @@ namespace LusasLookup
             // Load methods
             string[] typesToLoad = new string[]{ "Int32", "UInt32", "Int64", "UInt64", "Double", "String", "Boolean", "SByte" };
             MethodInfo getValueNamesMethod = null;
+            MethodInfo getValueUnitsMethod = null;
             MethodInfo getValueMethod = null;
             foreach (var method in methods) {
                 var methodName = method.Name + "()";
@@ -119,6 +120,8 @@ namespace LusasLookup
                 // Print saved values
                 if (methodName == "getValueNames()") {
                     getValueNamesMethod = method;
+                } else if (methodName == "getValueUnits()") {
+                    getValueUnitsMethod = method;
                 } else if (methodName == "getValue()") {
                     getValueMethod = method;
                 }
@@ -134,9 +137,16 @@ namespace LusasLookup
                         arguments[0] = l_name;
                         // Get value
                         var value = getValueMethod.Invoke((object)targetObjs, arguments);
+
+                        // Get value units
+                        arguments = new object[getValueUnitsMethod.GetParameters().Length];
+                        arguments[0] = l_name;
+                        var units = getValueUnitsMethod.Invoke((object)targetObjs, arguments);
+
                         // Get value type
                         string varType = value.GetType().ToString();
                         if (varType.StartsWith("System.")) varType = varType.Substring(7);
+                        if (units != null && units.ToString() !=  "None") varType += $" ({units.ToString()})";
 
                         dgvObjectMethods.Rows.Add($"getValue('{l_name}')", varType, value?.ToString() ?? "null");
                     } catch {
