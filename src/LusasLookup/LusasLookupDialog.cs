@@ -128,8 +128,16 @@ namespace LusasLookup
                 string[] savedValueNames = CastObject<string>.arrayFromArrayObject(getValueNamesMethod.Invoke((object)targetObjs, new object[getValueNamesMethod.GetParameters().Length]));
                 foreach (var l_name in savedValueNames) {
                     try {
-                        var value = getValueMethod.Invoke((object)targetObjs, new object[] { l_name, null });
-                        dgvObjectMethods.Rows.Add($"getValue('{l_name}')", value.GetType().ToString(), value?.ToString() ?? "null");
+                        // Create an object with the passed arguments and set the first as the value name
+                        var arguments = new object[getValueMethod.GetParameters().Length];
+                        arguments[0] = l_name;
+                        // Get value
+                        var value = getValueMethod.Invoke((object)targetObjs, arguments);
+                        // Get value type
+                        string varType = value.GetType().ToString();
+                        if (varType.StartsWith("System.")) varType = varType.Substring(7);
+
+                        dgvObjectMethods.Rows.Add($"getValue('{l_name}')", varType, value?.ToString() ?? "null");
                     } catch {
                         dgvObjectMethods.Rows.Add($"getValue('{l_name}')", "n/a", "error");
                     }
