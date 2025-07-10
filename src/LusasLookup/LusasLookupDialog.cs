@@ -12,6 +12,7 @@ using Lusas.Utils.Interop;
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Windows.Forms;
 using System.Xml.Linq;
 
@@ -43,16 +44,17 @@ namespace LusasLookup
             // Find launch target
             long noOfSelected = m_modeller.getSelection().count("all");
             IFDatabaseMember targetObject;
-            if (noOfSelected == 0)
-            {
+            if (noOfSelected == 0) {
                 // Nothing selected, target Visible or DB
                 // Get visible
                 targetObject = m_modeller.getVisibleSet();
                 // If all are visible, then pass database
                 if(m_modeller.db().count("all") == ((IFObjectSet)targetObject).count("all")) targetObject = m_modeller.db();
+
             } else if (noOfSelected == 1) {
                 // 1 selected, target it
                 targetObject = CastObject<IFDatabaseMember>.arrayFromArrayObject(m_modeller.getSelection().getObjects("all"))[0];
+
             } else {
                 // Selected object is targeted
                 targetObject = m_modeller.getSelection();
@@ -67,8 +69,7 @@ namespace LusasLookup
 
         /// <summary>Populate table with object properties and methods</summary>
         /// <param name="targetObjs">Target object</param>
-        private void PopulateDataGridView(object targetObjs)
-        {
+        private void PopulateDataGridView(object targetObjs) {
             // Clear current table
             dgvObjectMethods.Rows.Clear();
             txtViewObj.Text = "Loading...";
@@ -109,10 +110,37 @@ namespace LusasLookup
                     !method.GetParameters().Any(p => !p.IsOptional)) {
                     try {
                         var value = method.Invoke(targetObjs, new object[method.GetParameters().Length]);
+
+                        if (methodName == "getModificationTime()") {
+                            // Add value as date string at the end
+                            DateTime date = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+                            date = date.AddSeconds((ulong)value);
+                            value = $"{value.ToString()} ({date.ToString()})"; //Add date as 2025-07-10 16:00:00
+                        }
+
                         dgvObjectMethods.Rows.Add(methodName, retType, value?.ToString() ?? "null");
                     } catch {
                         dgvObjectMethods.Rows.Add(methodName, retType, "error");
                     }
+
+                } else if (methodName == "getModificationTime()") {
+                    try {
+                        // Create an object with the analysisOnly argument as true 
+                        var arguments = new object[method.GetParameters().Length];
+                        arguments[0] = true;
+                        // Get value
+                        var value = method.Invoke((object)targetObjs, arguments);
+
+                        // Add value as date string at the end
+                        DateTime date = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+                        date = date.AddSeconds((ulong)value);
+                        value = $"{value.ToString()} ({date.ToString()})"; //Add date as 2025-07-10 16:00:00
+
+                        dgvObjectMethods.Rows.Add(methodName, retType, value?.ToString() ?? "null");
+                    } catch {
+                        dgvObjectMethods.Rows.Add(methodName, retType, "error");
+                    }
+
                 } else {
                     dgvObjectMethods.Rows.Add(methodName, retType, "Method");
                 }
@@ -215,6 +243,9 @@ namespace LusasLookup
             }
 
             this.Cursor = Cursors.Default;
+
+            // Filter the DataGridView
+            FilterDataGridView();
         }
 
         /// <summary>Populate treeview with all database objects</summary>
@@ -374,11 +405,11 @@ namespace LusasLookup
         /// The term to search for within the cells of the <paramref name="dgv"/>.  If empty, all rows are displayed
         /// unless filtered by other conditions.
         /// </param>
-        private void filterDataGridView(DataGridView dgv, string searchTerm)
-        {
+        private void FilterDataGridView() {
+            string searchTerm = txtSearchMethods.Text.Trim();
             var valuesOnly = cbValuesOnly.Checked;
 
-            foreach (DataGridViewRow row in dgv.Rows)
+            foreach (DataGridViewRow row in dgvObjectMethods.Rows)
             {
                 // Hide rows that are not values only
                 if (valuesOnly && row.Cells[2].Value.ToString() == "Method")
@@ -427,10 +458,8 @@ namespace LusasLookup
         }
 
         /// <summary>Event triggered when the text in the search box for methods is changed.</summary>
-        private void txtSearchMethods_TextChanged(object sender, EventArgs e)
-        {
-            string searchTerm = txtSearchMethods.Text.Trim();
-            filterDataGridView(dgvObjectMethods, searchTerm);
+        private void txtSearchMethods_TextChanged(object sender, EventArgs e) {
+            FilterDataGridView();
         }
 
         /// <summary>Event triggered when the "Select" button is clicked.</summary>
@@ -461,8 +490,7 @@ namespace LusasLookup
 
         /// <summary>Even triggered when the "Values Only" checkbox is checked or unchecked.</summary>
         private void cbValuesOnly_CheckedChanged(object sender, EventArgs e) {
-            string searchTerm = txtSearchMethods.Text.Trim();
-            filterDataGridView(dgvObjectMethods, searchTerm);
+            FilterDataGridView();
         }
 
         #endregion

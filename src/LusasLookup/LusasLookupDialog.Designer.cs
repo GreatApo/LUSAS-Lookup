@@ -141,6 +141,8 @@ namespace LusasLookup
             // cbValuesOnly
             // 
             resources.ApplyResources(this.cbValuesOnly, "cbValuesOnly");
+            this.cbValuesOnly.Checked = true;
+            this.cbValuesOnly.CheckState = System.Windows.Forms.CheckState.Checked;
             this.cbValuesOnly.Name = "cbValuesOnly";
             this.cbValuesOnly.UseVisualStyleBackColor = true;
             this.cbValuesOnly.CheckedChanged += new System.EventHandler(this.cbValuesOnly_CheckedChanged);
