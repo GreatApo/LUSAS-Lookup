@@ -114,7 +114,7 @@ namespace LusasLookup
                         if (methodName == "getModificationTime()") {
                             // Add value as date string at the end
                             DateTime date = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-                            date = date.AddSeconds((ulong)value);
+                            date = date.AddSeconds((ulong)value); // TODO: Does not work for 32bit
                             value = $"{value.ToString()} ({date.ToString()})"; //Add date as 2025-07-10 16:00:00
                         }
 
@@ -169,17 +169,36 @@ namespace LusasLookup
                         // Get value
                         var value = getValueMethod.Invoke((object)targetObjs, arguments);
 
-                        // Get value units
-                        arguments = new object[getValueUnitsMethod.GetParameters().Length];
-                        arguments[0] = l_name;
-                        var units = getValueUnitsMethod.Invoke((object)targetObjs, arguments);
-
                         // Get value type
-                        string varType = value.GetType().ToString();
+                        string varType = value?.GetType().ToString() ?? "null";
                         if (varType.StartsWith("System.")) varType = varType.Substring(7);
-                        if (units != null && units.ToString() !=  "None") varType += $" ({units.ToString()})";
 
-                        dgvObjectMethods.Rows.Add($"getValue('{l_name}')", varType, value?.ToString() ?? "null");
+                        if (varType == "Object[]") {
+                            // Try to iterate array
+                            int i = 0;
+                            foreach (var l_value in (object[])value) {
+
+                                // Get value type
+                                string l_varType = l_value?.GetType().ToString() ?? "null";
+                                if (l_varType.StartsWith("System.")) l_varType = l_varType.Substring(7);
+
+                                dgvObjectMethods.Rows.Add($"getValue('{l_name}')[{i}]", l_varType, l_value?.ToString() ?? "null");
+                                i++;
+                            }
+
+                        } else {
+                            // Single value
+
+                            // Get value units
+                            arguments = new object[getValueUnitsMethod.GetParameters().Length];
+                            arguments[0] = l_name;
+                            var units = getValueUnitsMethod.Invoke((object)targetObjs, arguments);
+                            // Add to type
+                            if (units != null && units.ToString() !=  "None") varType += $" ({units.ToString()})";
+                            
+                            dgvObjectMethods.Rows.Add($"getValue('{l_name}')", varType, value?.ToString() ?? "null");
+                        }
+
 
                     } catch {
                         dgvObjectMethods.Rows.Add($"getValue('{l_name}')", "n/a", "error");
