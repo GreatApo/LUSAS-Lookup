@@ -119,6 +119,7 @@ namespace LusasLookup
                         }
 
                         dgvObjectMethods.Rows.Add(methodName, retType, value?.ToString() ?? "null");
+
                     } catch {
                         dgvObjectMethods.Rows.Add(methodName, retType, "error");
                     }
@@ -148,8 +149,10 @@ namespace LusasLookup
                 // Print saved values
                 if (methodName == "getValueNames()") {
                     getValueNamesMethod = method;
+
                 } else if (methodName == "getValueUnits()") {
                     getValueUnitsMethod = method;
+
                 } else if (methodName == "getValue()") {
                     getValueMethod = method;
                 }
@@ -177,6 +180,7 @@ namespace LusasLookup
                         if (units != null && units.ToString() !=  "None") varType += $" ({units.ToString()})";
 
                         dgvObjectMethods.Rows.Add($"getValue('{l_name}')", varType, value?.ToString() ?? "null");
+
                     } catch {
                         dgvObjectMethods.Rows.Add($"getValue('{l_name}')", "n/a", "error");
                     }
@@ -195,13 +199,13 @@ namespace LusasLookup
             if (objset != null) {
                 // Total volume
                 double vlmsVolume = CastObject<IFVolume>.arrayFromArrayObject(objset.getObjects("volume")).Select(s => s.getVolume()).DefaultIfEmpty(0).Sum();
-                dgvObjectMethods.Rows.Add("Total volumes volume", "Calculation", vlmsVolume);
+                dgvObjectMethods.Rows.Add("Total volumes volume", "Calculation", vlmsVolume.ToString());
                 // Total surface area
                 double surfsArea = objset.getSurfaces_Ext().Select(s => s.getArea()).DefaultIfEmpty(0).Sum();
-                dgvObjectMethods.Rows.Add("Total surfaces area", "Calculation", surfsArea);
+                dgvObjectMethods.Rows.Add("Total surfaces area", "Calculation", surfsArea.ToString());
                 // Total lines length
                 double linesLength = objset.getLines_Ext().Select(s => s.getLineLength()).DefaultIfEmpty(0).Sum();
-                dgvObjectMethods.Rows.Add("Total lines length", "Calculation", linesLength);
+                dgvObjectMethods.Rows.Add("Total lines length", "Calculation", linesLength.ToString());
 
                 // Total elements volume / area / length
                 long elms3D = 0;
@@ -234,12 +238,12 @@ namespace LusasLookup
                     }
                     // It shouldn't reach this point
                 }
-                dgvObjectMethods.Rows.Add("Number of 1D elements", "Calculation", elms1D);
-                dgvObjectMethods.Rows.Add("Total length of elements", "Calculation", elmsLength);
-                dgvObjectMethods.Rows.Add("Number of 2D elements", "Calculation", elms2D);
-                dgvObjectMethods.Rows.Add("Total area of elements", "Calculation", elmsArea);
-                dgvObjectMethods.Rows.Add("Number of 3D elements", "Calculation", elms3D);
-                dgvObjectMethods.Rows.Add("Total volume of elements", "Calculation", elmsVolume);
+                dgvObjectMethods.Rows.Add("Number of 1D elements", "Calculation", elms1D.ToString());
+                dgvObjectMethods.Rows.Add("Total length of elements", "Calculation", elmsLength.ToString());
+                dgvObjectMethods.Rows.Add("Number of 2D elements", "Calculation", elms2D.ToString());
+                dgvObjectMethods.Rows.Add("Total area of elements", "Calculation", elmsArea.ToString());
+                dgvObjectMethods.Rows.Add("Number of 3D elements", "Calculation", elms3D.ToString());
+                dgvObjectMethods.Rows.Add("Total volume of elements", "Calculation", elmsVolume.ToString());
             }
 
             this.Cursor = Cursors.Default;
