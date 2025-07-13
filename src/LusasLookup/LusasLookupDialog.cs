@@ -10,6 +10,7 @@ using Lusas.LPI;
 using Lusas.Module;
 using Lusas.Utils.Interop;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -71,9 +72,13 @@ namespace LusasLookup
         /// <param name="targetObjs">Target object</param>
         private void PopulateDataGridView(object targetObjs) {
             // Clear current table
-            dgvObjectMethods.Rows.Clear();
             txtViewObj.Text = "Loading...";
+            dgvObjectMethods.Rows.Clear();
             this.Cursor = Cursors.WaitCursor;
+
+            // Suspend layout to improve performance during bulk row additions
+            dgvObjectMethods.SuspendLayout();
+
             Type type = ComTypeHelper.GetCOMObjectType(targetObjs);
             var properties = type.GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
             var methods = type.GetMethods(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
@@ -95,9 +100,6 @@ namespace LusasLookup
 
             // Load methods
             string[] typesToLoad = new string[]{ "Int32", "UInt32", "Int64", "UInt64", "Double", "String", "Boolean", "SByte" };
-            MethodInfo getValueNamesMethod = null;
-            MethodInfo getValueUnitsMethod = null;
-            MethodInfo getValueMethod = null;
             foreach (var method in methods) {
                 var methodName = method.Name + "()";
                 var retType = method.ReturnType.Name;
@@ -114,7 +116,7 @@ namespace LusasLookup
                         if (methodName == "getModificationTime()") {
                             // Add value as date string at the end
                             DateTime date = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-                            date = date.AddSeconds((ulong)value); // TODO: Does not work for 32bit
+                            date = date.AddSeconds(Convert.ToInt32(value));
                             value = $"{value.ToString()} ({date.ToString()})"; //Add date as 2025-07-10 16:00:00
                         }
 
@@ -134,7 +136,7 @@ namespace LusasLookup
 
                         // Add value as date string at the end
                         DateTime date = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-                        date = date.AddSeconds((ulong)value);
+                        date = date.AddSeconds(Convert.ToInt32(value));
                         value = $"{value.ToString()} ({date.ToString()})"; //Add date as 2025-07-10 16:00:00
 
                         dgvObjectMethods.Rows.Add(methodName, retType, value?.ToString() ?? "null");
@@ -145,22 +147,19 @@ namespace LusasLookup
                 } else {
                     dgvObjectMethods.Rows.Add(methodName, retType, "Method");
                 }
-
-                // Print saved values
-                if (methodName == "getValueNames()") {
-                    getValueNamesMethod = method;
-
-                } else if (methodName == "getValueUnits()") {
-                    getValueUnitsMethod = method;
-
-                } else if (methodName == "getValue()") {
-                    getValueMethod = method;
-                }
             }
 
-            // Print object saved variables
+            // Print object saved values
+            MethodInfo getValueNamesMethod = methods.First(m => m.Name == "getValueNames");
             if (getValueNamesMethod != null) {
+                // Get available methods
+                MethodInfo getValueUnitsMethod = methods.FirstOrDefault(m => m.Name == "getValueUnits");
+                MethodInfo getValueMethod = methods.FirstOrDefault(m => m.Name == "getValue");
+
+                // Read value names
                 string[] savedValueNames = CastObject<string>.arrayFromArrayObject(getValueNamesMethod.Invoke((object)targetObjs, new object[getValueNamesMethod.GetParameters().Length]));
+
+                // Loop and print values
                 foreach (var l_name in savedValueNames) {
                     try {
                         // Create an object with the passed arguments and set the first as the value name
@@ -188,6 +187,19 @@ namespace LusasLookup
 
                         } else {
                             // Single value
+
+                            // Read saved COM object
+                            if (varType == "__ComObject") {
+                                Type t_type = ComTypeHelper.GetCOMObjectType(value);
+                                if (t_type != null) varType = t_type.ToString();
+                                if (varType.StartsWith("Lusas.LPI.")) {
+                                    varType = varType.Substring(10);
+                                    var t_methods = t_type.GetMethods(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+                                    MethodInfo t_getNameMethod = t_methods.First(m => m.Name == "getName");
+                                    var name = t_getNameMethod.Invoke((object)value, new object[t_getNameMethod.GetParameters().Length]);
+                                    if (name != null) value = name.ToString();
+                                }
+                            }
 
                             // Get value units
                             arguments = new object[getValueUnitsMethod.GetParameters().Length];
@@ -266,6 +278,8 @@ namespace LusasLookup
             }
 
             this.Cursor = Cursors.Default;
+            // Resume layout after all rows have been added
+            dgvObjectMethods.ResumeLayout();
 
             // Filter the DataGridView
             FilterDataGridView();
@@ -432,6 +446,9 @@ namespace LusasLookup
             string searchTerm = txtSearchMethods.Text.Trim();
             var valuesOnly = cbValuesOnly.Checked;
 
+            // Suspend layout to improve performance during bulk row additions
+            dgvObjectMethods.SuspendLayout();
+
             foreach (DataGridViewRow row in dgvObjectMethods.Rows)
             {
                 // Hide rows that are not values only
@@ -463,6 +480,9 @@ namespace LusasLookup
                 // Set the row visibility based on whether it matched the search
                 row.Visible = rowVisible;
             }
+
+            // Resume layout after all rows have been added
+            dgvObjectMethods.ResumeLayout();
         }
 
         #region "Events"

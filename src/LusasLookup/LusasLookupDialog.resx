@@ -121,109 +121,19 @@
     <value>17, 17</value>
   </metadata>
   <metadata name="ModuleBindingSource.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>178, 17</value>
+    <value>180, 17</value>
   </metadata>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="dgvObjectMethods.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Top, Bottom, Left, Right</value>
-  </data>
-  <metadata name="colName.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <data name="colName.HeaderText" xml:space="preserve">
-    <value>Name</value>
-  </data>
-  <metadata name="colType.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <data name="colType.HeaderText" xml:space="preserve">
-    <value>Type</value>
-  </data>
-  <metadata name="colValue.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <data name="colValue.HeaderText" xml:space="preserve">
-    <value>Value</value>
-  </data>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="dgvObjectMethods.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 54</value>
-  </data>
-  <data name="dgvObjectMethods.Size" type="System.Drawing.Size, System.Drawing">
-    <value>458, 389</value>
-  </data>
-  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="dgvObjectMethods.TabIndex" type="System.Int32, mscorlib">
-    <value>0</value>
-  </data>
-  <data name="&gt;&gt;dgvObjectMethods.Name" xml:space="preserve">
-    <value>dgvObjectMethods</value>
-  </data>
-  <data name="&gt;&gt;dgvObjectMethods.Type" xml:space="preserve">
-    <value>System.Windows.Forms.DataGridView, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;dgvObjectMethods.Parent" xml:space="preserve">
-    <value>splitContainer1.Panel2</value>
-  </data>
-  <data name="&gt;&gt;dgvObjectMethods.ZOrder" xml:space="preserve">
-    <value>5</value>
-  </data>
-  <data name="treeView.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Top, Bottom, Left, Right</value>
-  </data>
-  <data name="treeView.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 29</value>
-  </data>
-  <data name="treeView.Size" type="System.Drawing.Size, System.Drawing">
-    <value>228, 414</value>
-  </data>
-  <data name="treeView.TabIndex" type="System.Int32, mscorlib">
-    <value>1</value>
-  </data>
-  <data name="&gt;&gt;treeView.Name" xml:space="preserve">
-    <value>treeView</value>
-  </data>
-  <data name="&gt;&gt;treeView.Type" xml:space="preserve">
-    <value>System.Windows.Forms.TreeView, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;treeView.Parent" xml:space="preserve">
-    <value>splitContainer1.Panel1</value>
-  </data>
-  <data name="&gt;&gt;treeView.ZOrder" xml:space="preserve">
-    <value>2</value>
-  </data>
-  <data name="btnHighlight.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Top, Right</value>
-  </data>
-  <data name="btnHighlight.Location" type="System.Drawing.Point, System.Drawing">
-    <value>368, 3</value>
-  </data>
-  <data name="btnHighlight.Size" type="System.Drawing.Size, System.Drawing">
-    <value>93, 23</value>
-  </data>
-  <data name="btnHighlight.TabIndex" type="System.Int32, mscorlib">
-    <value>2</value>
-  </data>
-  <data name="btnHighlight.Text" xml:space="preserve">
-    <value>Select</value>
-  </data>
-  <data name="&gt;&gt;btnHighlight.Name" xml:space="preserve">
-    <value>btnHighlight</value>
-  </data>
-  <data name="&gt;&gt;btnHighlight.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;btnHighlight.Parent" xml:space="preserve">
-    <value>splitContainer1.Panel2</value>
-  </data>
-  <data name="&gt;&gt;btnHighlight.ZOrder" xml:space="preserve">
-    <value>4</value>
-  </data>
   <data name="splitContainer1.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Bottom, Left, Right</value>
   </data>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="splitContainer1.Location" type="System.Drawing.Point, System.Drawing">
     <value>12, 12</value>
+  </data>
+  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="splitContainer1.Panel1.AutoScroll" type="System.Boolean, mscorlib">
+    <value>True</value>
   </data>
   <data name="lblSearchTree.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -255,6 +165,9 @@
   <data name="&gt;&gt;lblSearchTree.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
+  <data name="txtSearchTree.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Left, Right</value>
+  </data>
   <data name="txtSearchTree.Location" type="System.Drawing.Point, System.Drawing">
     <value>53, 3</value>
   </data>
@@ -276,6 +189,30 @@
   <data name="&gt;&gt;txtSearchTree.ZOrder" xml:space="preserve">
     <value>1</value>
   </data>
+  <data name="treeView.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Bottom, Left, Right</value>
+  </data>
+  <data name="treeView.Location" type="System.Drawing.Point, System.Drawing">
+    <value>3, 29</value>
+  </data>
+  <data name="treeView.Size" type="System.Drawing.Size, System.Drawing">
+    <value>228, 414</value>
+  </data>
+  <data name="treeView.TabIndex" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="&gt;&gt;treeView.Name" xml:space="preserve">
+    <value>treeView</value>
+  </data>
+  <data name="&gt;&gt;treeView.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TreeView, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;treeView.Parent" xml:space="preserve">
+    <value>splitContainer1.Panel1</value>
+  </data>
+  <data name="&gt;&gt;treeView.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
   <data name="&gt;&gt;splitContainer1.Panel1.Name" xml:space="preserve">
     <value>splitContainer1.Panel1</value>
   </data>
@@ -288,6 +225,15 @@
   <data name="&gt;&gt;splitContainer1.Panel1.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
+  <data name="splitContainer1.Panel1MinSize" type="System.Int32, mscorlib">
+    <value>100</value>
+  </data>
+  <data name="splitContainer1.Panel2.AutoScroll" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="txtViewObj.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Left, Right</value>
+  </data>
   <data name="txtViewObj.Font" type="System.Drawing.Font, System.Drawing">
     <value>Microsoft Sans Serif, 9pt, style=Bold, Underline</value>
   </data>
@@ -298,7 +244,7 @@
     <value>True</value>
   </data>
   <data name="txtViewObj.Size" type="System.Drawing.Size, System.Drawing">
-    <value>334, 20</value>
+    <value>356, 20</value>
   </data>
   <data name="txtViewObj.TabIndex" type="System.Int32, mscorlib">
     <value>8</value>
@@ -318,11 +264,14 @@
   <data name="&gt;&gt;txtViewObj.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
+  <data name="cbValuesOnly.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Right</value>
+  </data>
   <data name="cbValuesOnly.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
   <data name="cbValuesOnly.Location" type="System.Drawing.Point, System.Drawing">
-    <value>248, 28</value>
+    <value>352, 28</value>
   </data>
   <data name="cbValuesOnly.Size" type="System.Drawing.Size, System.Drawing">
     <value>109, 17</value>
@@ -375,11 +324,14 @@
   <data name="&gt;&gt;lblSearchMethods.ZOrder" xml:space="preserve">
     <value>2</value>
   </data>
+  <data name="txtSearchMethods.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Left, Right</value>
+  </data>
   <data name="txtSearchMethods.Location" type="System.Drawing.Point, System.Drawing">
     <value>50, 26</value>
   </data>
   <data name="txtSearchMethods.Size" type="System.Drawing.Size, System.Drawing">
-    <value>178, 20</value>
+    <value>287, 20</value>
   </data>
   <data name="txtSearchMethods.TabIndex" type="System.Int32, mscorlib">
     <value>5</value>
@@ -396,6 +348,66 @@
   <data name="&gt;&gt;txtSearchMethods.ZOrder" xml:space="preserve">
     <value>3</value>
   </data>
+  <data name="btnHighlight.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Right</value>
+  </data>
+  <data name="btnHighlight.Location" type="System.Drawing.Point, System.Drawing">
+    <value>368, 3</value>
+  </data>
+  <data name="btnHighlight.Size" type="System.Drawing.Size, System.Drawing">
+    <value>93, 23</value>
+  </data>
+  <data name="btnHighlight.TabIndex" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="btnHighlight.Text" xml:space="preserve">
+    <value>Select</value>
+  </data>
+  <data name="&gt;&gt;btnHighlight.Name" xml:space="preserve">
+    <value>btnHighlight</value>
+  </data>
+  <data name="&gt;&gt;btnHighlight.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Button, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;btnHighlight.Parent" xml:space="preserve">
+    <value>splitContainer1.Panel2</value>
+  </data>
+  <data name="&gt;&gt;btnHighlight.ZOrder" xml:space="preserve">
+    <value>4</value>
+  </data>
+  <metadata name="colName.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="colType.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="colValue.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="dgvObjectMethods.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Bottom, Left, Right</value>
+  </data>
+  <data name="dgvObjectMethods.Location" type="System.Drawing.Point, System.Drawing">
+    <value>3, 54</value>
+  </data>
+  <data name="dgvObjectMethods.Size" type="System.Drawing.Size, System.Drawing">
+    <value>458, 389</value>
+  </data>
+  <data name="dgvObjectMethods.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;dgvObjectMethods.Name" xml:space="preserve">
+    <value>dgvObjectMethods</value>
+  </data>
+  <data name="&gt;&gt;dgvObjectMethods.Type" xml:space="preserve">
+    <value>System.Windows.Forms.DataGridView, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;dgvObjectMethods.Parent" xml:space="preserve">
+    <value>splitContainer1.Panel2</value>
+  </data>
+  <data name="&gt;&gt;dgvObjectMethods.ZOrder" xml:space="preserve">
+    <value>5</value>
+  </data>
   <data name="&gt;&gt;splitContainer1.Panel2.Name" xml:space="preserve">
     <value>splitContainer1.Panel2</value>
   </data>
@@ -407,6 +419,9 @@
   </data>
   <data name="&gt;&gt;splitContainer1.Panel2.ZOrder" xml:space="preserve">
     <value>1</value>
+  </data>
+  <data name="splitContainer1.Panel2MinSize" type="System.Int32, mscorlib">
+    <value>200</value>
   </data>
   <data name="splitContainer1.Size" type="System.Drawing.Size, System.Drawing">
     <value>702, 450</value>
@@ -429,6 +444,30 @@
   <data name="&gt;&gt;splitContainer1.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
+  <metadata name="colName.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="colName.HeaderText" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="colName.Width" type="System.Int32, mscorlib">
+    <value>60</value>
+  </data>
+  <metadata name="colType.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="colType.HeaderText" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="colType.Width" type="System.Int32, mscorlib">
+    <value>56</value>
+  </data>
+  <metadata name="colValue.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="colValue.HeaderText" xml:space="preserve">
+    <value>Value</value>
+  </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
@@ -437,6 +476,9 @@
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
     <value>726, 474</value>
+  </data>
+  <data name="$this.MinimumSize" type="System.Drawing.Size, System.Drawing">
+    <value>350, 150</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
     <value>🔎 LUSAS Lookup</value>
@@ -475,6 +517,6 @@
     <value>LusasLookupDialog</value>
   </data>
   <data name="&gt;&gt;$this.Type" xml:space="preserve">
-    <value>Lusas.Module.LusasModuleDialog, Lusas.Interop, Version=22.0.1601.51518, Culture=neutral, PublicKeyToken=ee620220e102840a</value>
+    <value>Lusas.Module.LusasModuleDialog, Lusas.Interop, Version=23.0.801.51265, Culture=neutral, PublicKeyToken=ee620220e102840a</value>
   </data>
 </root>

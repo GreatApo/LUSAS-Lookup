@@ -30,71 +30,27 @@ namespace LusasLookup
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(LusasLookupDialog));
+            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.lblSearchTree = new System.Windows.Forms.Label();
+            this.txtSearchTree = new System.Windows.Forms.TextBox();
+            this.treeView = new System.Windows.Forms.TreeView();
+            this.txtViewObj = new System.Windows.Forms.TextBox();
+            this.cbValuesOnly = new System.Windows.Forms.CheckBox();
+            this.lblSearchMethods = new System.Windows.Forms.Label();
+            this.txtSearchMethods = new System.Windows.Forms.TextBox();
+            this.btnHighlight = new System.Windows.Forms.Button();
             this.dgvObjectMethods = new System.Windows.Forms.DataGridView();
             this.colName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colType = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.colValue = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.treeView = new System.Windows.Forms.TreeView();
-            this.btnHighlight = new System.Windows.Forms.Button();
-            this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.lblSearchTree = new System.Windows.Forms.Label();
-            this.txtSearchTree = new System.Windows.Forms.TextBox();
-            this.lblSearchMethods = new System.Windows.Forms.Label();
-            this.txtSearchMethods = new System.Windows.Forms.TextBox();
-            this.cbValuesOnly = new System.Windows.Forms.CheckBox();
-            this.txtViewObj = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.DefaultErrorProvider)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.ModuleBindingSource)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvObjectMethods)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvObjectMethods)).BeginInit();
             this.SuspendLayout();
-            // 
-            // dgvObjectMethods
-            // 
-            this.dgvObjectMethods.AllowUserToAddRows = false;
-            this.dgvObjectMethods.AllowUserToDeleteRows = false;
-            resources.ApplyResources(this.dgvObjectMethods, "dgvObjectMethods");
-            this.dgvObjectMethods.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this.dgvObjectMethods.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvObjectMethods.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.colName,
-            this.colType,
-            this.colValue});
-            this.dgvObjectMethods.Name = "dgvObjectMethods";
-            this.dgvObjectMethods.RowHeadersVisible = false;
-            // 
-            // colName
-            // 
-            resources.ApplyResources(this.colName, "colName");
-            this.colName.Name = "colName";
-            this.colName.ReadOnly = true;
-            // 
-            // colType
-            // 
-            resources.ApplyResources(this.colType, "colType");
-            this.colType.Name = "colType";
-            this.colType.ReadOnly = true;
-            // 
-            // colValue
-            // 
-            resources.ApplyResources(this.colValue, "colValue");
-            this.colValue.Name = "colValue";
-            this.colValue.ReadOnly = true;
-            // 
-            // treeView
-            // 
-            resources.ApplyResources(this.treeView, "treeView");
-            this.treeView.Name = "treeView";
-            // 
-            // btnHighlight
-            // 
-            resources.ApplyResources(this.btnHighlight, "btnHighlight");
-            this.btnHighlight.Name = "btnHighlight";
-            this.btnHighlight.UseVisualStyleBackColor = true;
-            this.btnHighlight.Click += new System.EventHandler(this.btnHighlight_Click);
             // 
             // splitContainer1
             // 
@@ -103,12 +59,14 @@ namespace LusasLookup
             // 
             // splitContainer1.Panel1
             // 
+            resources.ApplyResources(this.splitContainer1.Panel1, "splitContainer1.Panel1");
             this.splitContainer1.Panel1.Controls.Add(this.lblSearchTree);
             this.splitContainer1.Panel1.Controls.Add(this.txtSearchTree);
             this.splitContainer1.Panel1.Controls.Add(this.treeView);
             // 
             // splitContainer1.Panel2
             // 
+            resources.ApplyResources(this.splitContainer1.Panel2, "splitContainer1.Panel2");
             this.splitContainer1.Panel2.Controls.Add(this.txtViewObj);
             this.splitContainer1.Panel2.Controls.Add(this.cbValuesOnly);
             this.splitContainer1.Panel2.Controls.Add(this.lblSearchMethods);
@@ -127,6 +85,28 @@ namespace LusasLookup
             this.txtSearchTree.Name = "txtSearchTree";
             this.txtSearchTree.TextChanged += new System.EventHandler(this.txtSearchTree_TextChanged);
             // 
+            // treeView
+            // 
+            resources.ApplyResources(this.treeView, "treeView");
+            this.treeView.Name = "treeView";
+            // 
+            // txtViewObj
+            // 
+            resources.ApplyResources(this.txtViewObj, "txtViewObj");
+            this.txtViewObj.BackColor = System.Drawing.SystemColors.Control;
+            this.txtViewObj.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txtViewObj.Name = "txtViewObj";
+            this.txtViewObj.ReadOnly = true;
+            // 
+            // cbValuesOnly
+            // 
+            resources.ApplyResources(this.cbValuesOnly, "cbValuesOnly");
+            this.cbValuesOnly.Checked = true;
+            this.cbValuesOnly.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.cbValuesOnly.Name = "cbValuesOnly";
+            this.cbValuesOnly.UseVisualStyleBackColor = true;
+            this.cbValuesOnly.CheckedChanged += new System.EventHandler(this.cbValuesOnly_CheckedChanged);
+            // 
             // lblSearchMethods
             // 
             resources.ApplyResources(this.lblSearchMethods, "lblSearchMethods");
@@ -138,38 +118,64 @@ namespace LusasLookup
             this.txtSearchMethods.Name = "txtSearchMethods";
             this.txtSearchMethods.TextChanged += new System.EventHandler(this.txtSearchMethods_TextChanged);
             // 
-            // cbValuesOnly
+            // btnHighlight
             // 
-            resources.ApplyResources(this.cbValuesOnly, "cbValuesOnly");
-            this.cbValuesOnly.Checked = true;
-            this.cbValuesOnly.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.cbValuesOnly.Name = "cbValuesOnly";
-            this.cbValuesOnly.UseVisualStyleBackColor = true;
-            this.cbValuesOnly.CheckedChanged += new System.EventHandler(this.cbValuesOnly_CheckedChanged);
+            resources.ApplyResources(this.btnHighlight, "btnHighlight");
+            this.btnHighlight.Name = "btnHighlight";
+            this.btnHighlight.UseVisualStyleBackColor = true;
+            this.btnHighlight.Click += new System.EventHandler(this.btnHighlight_Click);
             // 
-            // txtViewObj
+            // dgvObjectMethods
             // 
-            this.txtViewObj.BackColor = System.Drawing.SystemColors.Control;
-            this.txtViewObj.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            resources.ApplyResources(this.txtViewObj, "txtViewObj");
-            this.txtViewObj.Name = "txtViewObj";
-            this.txtViewObj.ReadOnly = true;
+            this.dgvObjectMethods.AllowUserToAddRows = false;
+            this.dgvObjectMethods.AllowUserToDeleteRows = false;
+            resources.ApplyResources(this.dgvObjectMethods, "dgvObjectMethods");
+            this.dgvObjectMethods.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvObjectMethods.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvObjectMethods.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.colName,
+            this.colType,
+            this.colValue});
+            this.dgvObjectMethods.Name = "dgvObjectMethods";
+            this.dgvObjectMethods.RowHeadersVisible = false;
+            // 
+            // colName
+            // 
+            this.colName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            resources.ApplyResources(this.colName, "colName");
+            this.colName.Name = "colName";
+            this.colName.ReadOnly = true;
+            // 
+            // colType
+            // 
+            this.colType.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            resources.ApplyResources(this.colType, "colType");
+            this.colType.Name = "colType";
+            this.colType.ReadOnly = true;
+            // 
+            // colValue
+            // 
+            resources.ApplyResources(this.colValue, "colValue");
+            this.colValue.Name = "colValue";
+            this.colValue.ReadOnly = true;
             // 
             // LusasLookupDialog
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.splitContainer1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
+            this.MaximizeBox = true;
             this.Name = "LusasLookupDialog";
             ((System.ComponentModel.ISupportInitialize)(this.DefaultErrorProvider)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.ModuleBindingSource)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvObjectMethods)).EndInit();
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel1.PerformLayout();
             this.splitContainer1.Panel2.ResumeLayout(false);
             this.splitContainer1.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dgvObjectMethods)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -180,15 +186,15 @@ namespace LusasLookup
         private System.Windows.Forms.TreeView treeView;
         private System.Windows.Forms.Button btnHighlight;
         private System.Windows.Forms.SplitContainer splitContainer1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colName;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colType;
-        private System.Windows.Forms.DataGridViewTextBoxColumn colValue;
         private System.Windows.Forms.Label lblSearchTree;
         private System.Windows.Forms.TextBox txtSearchTree;
         private System.Windows.Forms.Label lblSearchMethods;
         private System.Windows.Forms.TextBox txtSearchMethods;
         private System.Windows.Forms.TextBox txtViewObj;
         private System.Windows.Forms.CheckBox cbValuesOnly;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colName;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colType;
+        private System.Windows.Forms.DataGridViewTextBoxColumn colValue;
     }
 }
 
