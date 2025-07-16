@@ -17,18 +17,15 @@ using System.Reflection.Emit;
 using System.Windows.Forms;
 using System.Xml.Linq;
 
-namespace LusasLookup
-{
+namespace LusasLookup {
     /// <summary>Module dialog providing UI to access LusasLookupModule functionality</summary>
-    public partial class LusasLookupDialog : LusasModuleDialog
-    {
+    public partial class LusasLookupDialog : LusasModuleDialog {
         private LusasLookupModule m_module; // Reference to the module 
         private IFModeller m_modeller; // Reference to Modeller
 
         /// <summary>Constructs an instance of the safeprojectnameModule dialog</summary>
         /// <param name="lusasModule"></param>
-        public LusasLookupDialog(LusasLookupModule lusasModule) : base(lusasModule)
-        {
+        public LusasLookupDialog(LusasLookupModule lusasModule) : base(lusasModule) {
             m_module = lusasModule;
             m_modeller = lusasModule.Modeller;
 
@@ -50,7 +47,7 @@ namespace LusasLookup
                 // Get visible
                 targetObject = m_modeller.getVisibleSet();
                 // If all are visible, then pass database
-                if(m_modeller.db().count("all") == ((IFObjectSet)targetObject).count("all")) targetObject = m_modeller.db();
+                if (m_modeller.db().count("all") == ((IFObjectSet)targetObject).count("all")) targetObject = m_modeller.db();
 
             } else if (noOfSelected == 1) {
                 // 1 selected, target it
@@ -95,19 +92,19 @@ namespace LusasLookup
             // Load properties
             foreach (var property in properties) {
                 var value = property.GetValue(targetObjs);
-                dgvObjectMethods.Rows.Add(property.Name, property.PropertyType.Name, value?.ToString() ?? "null");
+                dgvObjectMethods.Rows.Add(property.Name, property.PropertyType.Name, value?.ToString() ?? "Null");
             }
 
             // Load methods
-            string[] typesToLoad = new string[]{ "Int32", "UInt32", "Int64", "UInt64", "Double", "String", "Boolean", "SByte" };
+            string[] typesToLoad = new string[] { "Int32", "UInt32", "Int64", "UInt64", "Double", "String", "Boolean", "SByte" };
             foreach (var method in methods) {
                 var methodName = method.Name + "()";
                 var retType = method.ReturnType.Name;
 
                 // Try to load some of the method returns
-                if (typesToLoad.Contains(retType) && 
-                    !methodName.StartsWith("delete") && !methodName.StartsWith("solve") && 
-                    (retType!= "Boolean" || methodName.StartsWith("is") || methodName.StartsWith("has") || methodName.StartsWith("needs")) &&
+                if (typesToLoad.Contains(retType) &&
+                    !methodName.StartsWith("delete") && !methodName.StartsWith("solve") &&
+                    (retType != "Boolean" || methodName.StartsWith("is") || methodName.StartsWith("has") || methodName.StartsWith("needs")) &&
                     methodName != "showEditDlg()" &&
                     !method.GetParameters().Any(p => !p.IsOptional)) {
                     try {
@@ -116,11 +113,11 @@ namespace LusasLookup
                         if (methodName == "getModificationTime()") {
                             // Add value as date string at the end
                             DateTime date = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-                            date = date.AddSeconds(Convert.ToInt32(value));
+                            date = date.AddSeconds(Convert.ToInt32(value)); // TODO: Does not work for 32bit
                             value = $"{value.ToString()} ({date.ToString()})"; //Add date as 2025-07-10 16:00:00
                         }
 
-                        dgvObjectMethods.Rows.Add(methodName, retType, value?.ToString() ?? "null");
+                        dgvObjectMethods.Rows.Add(methodName, retType, value?.ToString() ?? "Null");
 
                     } catch {
                         dgvObjectMethods.Rows.Add(methodName, retType, "error");
@@ -139,7 +136,7 @@ namespace LusasLookup
                         date = date.AddSeconds(Convert.ToInt32(value));
                         value = $"{value.ToString()} ({date.ToString()})"; //Add date as 2025-07-10 16:00:00
 
-                        dgvObjectMethods.Rows.Add(methodName, retType, value?.ToString() ?? "null");
+                        dgvObjectMethods.Rows.Add(methodName, retType, value?.ToString() ?? "Null");
                     } catch {
                         dgvObjectMethods.Rows.Add(methodName, retType, "error");
                     }
@@ -169,19 +166,33 @@ namespace LusasLookup
                         var value = getValueMethod.Invoke((object)targetObjs, arguments);
 
                         // Get value type
-                        string varType = value?.GetType().ToString() ?? "null";
+                        string varType = value?.GetType().ToString() ?? "Null";
                         if (varType.StartsWith("System.")) varType = varType.Substring(7);
 
                         if (varType == "Object[]") {
                             // Try to iterate array
                             int i = 0;
                             foreach (var l_value in (object[])value) {
+                                var l_value_i = l_value;
 
                                 // Get value type
-                                string l_varType = l_value?.GetType().ToString() ?? "null";
+                                string l_varType = l_value?.GetType().ToString() ?? "Null";
                                 if (l_varType.StartsWith("System.")) l_varType = l_varType.Substring(7);
 
-                                dgvObjectMethods.Rows.Add($"getValue('{l_name}')[{i}]", l_varType, l_value?.ToString() ?? "null");
+                                // Read saved COM object
+                                if (l_varType == "__ComObject") {
+                                    Type t_type = ComTypeHelper.GetCOMObjectType(l_value);
+                                    if (t_type != null) l_varType = t_type.ToString();
+                                    if (l_varType.StartsWith("Lusas.LPI.")) {
+                                        l_varType = l_varType.Substring(10);
+                                        var t_methods = t_type.GetMethods(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+                                        MethodInfo t_getNameMethod = t_methods.First(m => m.Name == "getName");
+                                        var name = t_getNameMethod.Invoke((object)l_value, new object[t_getNameMethod.GetParameters().Length]);
+                                        if (name != null) l_value_i = name.ToString();
+                                    }
+                                }
+
+                                dgvObjectMethods.Rows.Add($"getValue('{l_name}')[{i}]", l_varType, l_value_i?.ToString() ?? "Null");
                                 i++;
                             }
 
@@ -206,9 +217,9 @@ namespace LusasLookup
                             arguments[0] = l_name;
                             var units = getValueUnitsMethod.Invoke((object)targetObjs, arguments);
                             // Add to type
-                            if (units != null && units.ToString() !=  "None") varType += $" ({units.ToString()})";
-                            
-                            dgvObjectMethods.Rows.Add($"getValue('{l_name}')", varType, value?.ToString() ?? "null");
+                            if (units != null && units.ToString() != "None") varType += $" ({units.ToString()})";
+
+                            dgvObjectMethods.Rows.Add($"getValue('{l_name}')", varType, value?.ToString() ?? "Null");
                         }
 
 
@@ -245,8 +256,7 @@ namespace LusasLookup
                 double elmsLength = 0;
                 double elmsArea = 0;
                 double elmsVolume = 0;
-                foreach (IFElement elm in objset.getElements_Ext())
-                {
+                foreach (IFElement elm in objset.getElements_Ext()) {
                     double l_length = elm.getLength();
                     if (l_length > 0) {
                         elms1D += 1;
@@ -254,15 +264,13 @@ namespace LusasLookup
                         continue;
                     }
                     double l_area = elm.getArea();
-                    if (l_area > 0)
-                    {
+                    if (l_area > 0) {
                         elms2D += 1;
                         elmsArea += l_area;
                         continue;
                     }
                     double l_volume = elm.getVolume();
-                    if (l_area > 0)
-                    {
+                    if (l_area > 0) {
                         elms3D += 1;
                         elmsVolume += l_volume;
                         continue;
@@ -286,8 +294,7 @@ namespace LusasLookup
         }
 
         /// <summary>Populate treeview with all database objects</summary>
-        public void PopulateTreeView()
-        {
+        public void PopulateTreeView() {
             string searchTerm = txtSearchTree.Text.Trim();
 
             // Clear the TreeView
@@ -327,7 +334,7 @@ namespace LusasLookup
                     target_cat_node = l_cat_node;
                     break;
                 }
-                if (target_cat_node == null) { 
+                if (target_cat_node == null) {
                     target_cat_node = new TreeNode(attrType);
                     attsNode.Nodes.Add(target_cat_node);
                 }
@@ -387,14 +394,12 @@ namespace LusasLookup
         /// <summary>Add geometry lower order features in the given treeview option</summary>
         /// <param name="geom">Target geometry</param>
         /// <param name="node">Target treeview node</param>
-        private void PopulateLOF(IFGeometry geom, TreeNode node)
-        {
+        private void PopulateLOF(IFGeometry geom, TreeNode node) {
             var typeCode = geom.getTypeCode();
             if (typeCode > 5) return;
 
             var loGeom = geom.getLOFs_Ext();
-            foreach (var l_geom in loGeom)
-            {
+            foreach (var l_geom in loGeom) {
                 var l_typeCode = l_geom.getTypeCode();
                 if (l_typeCode > 5) continue;
 
@@ -409,11 +414,9 @@ namespace LusasLookup
 
         /// <summary>Convert object type code to string</summary>
         /// <param name="geom">Target geometry</param>
-        private string typeCodeToStr(IFGeometry geom)
-        {
+        private string typeCodeToStr(IFGeometry geom) {
             var typeCode = geom.getTypeCode();
-            switch (typeCode)
-            {
+            switch (typeCode) {
                 case 1:
                     return "Point";
                 case 2:
@@ -437,11 +440,6 @@ namespace LusasLookup
         /// option is enabled,  if the value in the third column is "Method". The search is case-insensitive and checks
         /// all cells  in each row for a match.
         /// </remarks>
-        /// <param name="dgv">The <see cref="DataGridView"/> to filter.</param>
-        /// <param name="searchTerm">
-        /// The term to search for within the cells of the <paramref name="dgv"/>.  If empty, all rows are displayed
-        /// unless filtered by other conditions.
-        /// </param>
         private void FilterDataGridView() {
             string searchTerm = txtSearchMethods.Text.Trim();
             var valuesOnly = cbValuesOnly.Checked;
@@ -449,11 +447,9 @@ namespace LusasLookup
             // Suspend layout to improve performance during bulk row additions
             dgvObjectMethods.SuspendLayout();
 
-            foreach (DataGridViewRow row in dgvObjectMethods.Rows)
-            {
+            foreach (DataGridViewRow row in dgvObjectMethods.Rows) {
                 // Hide rows that are not values only
-                if (valuesOnly && row.Cells[2].Value.ToString() == "Method")
-                {
+                if (valuesOnly && row.Cells[2].Value.ToString() == "Method") {
                     row.Visible = false;
                     continue;
                 }
@@ -467,11 +463,9 @@ namespace LusasLookup
                 bool rowVisible = false;
 
                 // Check if any cell in the row contains the search term
-                foreach (DataGridViewCell cell in row.Cells)
-                {
+                foreach (DataGridViewCell cell in row.Cells) {
                     if (cell.Value != null &&
-                        cell.Value.ToString().IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0)
-                    {
+                        cell.Value.ToString().IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0) {
                         rowVisible = true;
                         break;
                     }
@@ -488,8 +482,7 @@ namespace LusasLookup
         #region "Events"
 
         /// <summary>Event triggered when a node in the tree view is clicked.</summary>
-        private void TreeView_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
-        {
+        private void TreeView_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e) {
             if (e.Node.Tag == null) return;
             // Populate table based on the object associated with the clicked node
             PopulateDataGridView(e.Node.Tag);
@@ -506,8 +499,7 @@ namespace LusasLookup
         }
 
         /// <summary>Event triggered when the "Select" button is clicked.</summary>
-        private void btnHighlight_Click(object sender, EventArgs e)
-        {
+        private void btnHighlight_Click(object sender, EventArgs e) {
             if (treeView.SelectedNode == null) return;
             IFDatabaseMember member = treeView.SelectedNode.Tag as IFDatabaseMember;
             if (member == null) return;
