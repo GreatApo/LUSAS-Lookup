@@ -169,6 +169,12 @@ namespace LusasLookup {
                         string varType = value?.GetType().ToString() ?? "Null";
                         if (varType.StartsWith("System.")) varType = varType.Substring(7);
 
+                        // Get value units
+                        arguments = new object[getValueUnitsMethod.GetParameters().Length];
+                        arguments[0] = l_name;
+                        var units = getValueUnitsMethod.Invoke((object)targetObjs, arguments);
+
+                        // Print based on type
                         if (varType == "Object[]") {
                             // Try to iterate array
                             int i = 0;
@@ -178,6 +184,9 @@ namespace LusasLookup {
                                 // Get value type
                                 string l_varType = l_value?.GetType().ToString() ?? "Null";
                                 if (l_varType.StartsWith("System.")) l_varType = l_varType.Substring(7);
+
+                                // Add units in type
+                                if (units != null && units.ToString() != "None") l_varType += $" ({units.ToString()})";
 
                                 // Read saved COM object
                                 if (l_varType == "__ComObject") {
@@ -212,11 +221,7 @@ namespace LusasLookup {
                                 }
                             }
 
-                            // Get value units
-                            arguments = new object[getValueUnitsMethod.GetParameters().Length];
-                            arguments[0] = l_name;
-                            var units = getValueUnitsMethod.Invoke((object)targetObjs, arguments);
-                            // Add to type
+                            // Add units in type
                             if (units != null && units.ToString() != "None") varType += $" ({units.ToString()})";
 
                             dgvObjectMethods.Rows.Add($"getValue('{l_name}')", varType, value?.ToString() ?? "Null");
