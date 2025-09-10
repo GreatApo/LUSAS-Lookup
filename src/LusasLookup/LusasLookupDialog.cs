@@ -147,7 +147,7 @@ namespace LusasLookup {
             }
 
             // Print object saved values
-            MethodInfo getValueNamesMethod = methods.First(m => m.Name == "getValueNames");
+            MethodInfo getValueNamesMethod = methods.FirstOrDefault(m => m.Name == "getValueNames");
             if (getValueNamesMethod != null) {
                 // Get available methods
                 MethodInfo getValueUnitsMethod = methods.FirstOrDefault(m => m.Name == "getValueUnits");
