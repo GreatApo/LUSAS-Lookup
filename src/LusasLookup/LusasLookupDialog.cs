@@ -394,6 +394,36 @@ namespace LusasLookup {
                 l_node.Tag = l_group;
                 groupsNode.Nodes.Add(l_node);
             }
+
+            // Other objects
+            // Reference Paths
+            string l_objName = "Reference Path";
+            var objs = CastObject<IFReferencePath>.arrayFromArrayObject(m_modeller.db().getObjects(l_objName));
+            TreeNode objNode = new TreeNode($"{l_objName}s ({objs.Length})");
+            treeView.Nodes.Add(objNode);
+            foreach (var l_obj in objs) {
+                string l_name = l_obj.getName();
+                // Skip if filtered
+                if (searchTerm != "" && l_name.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) < 0) continue;
+
+                TreeNode l_node = new TreeNode(l_name);
+                l_node.Tag = l_obj;
+                objNode.Nodes.Add(l_node);
+            }
+            // Inspection Lines
+            l_objName = "Beam/Shell Slicing";
+            var objs2 = CastObject<IFBeamShellSlice>.arrayFromArrayObject(m_modeller.db().getObjects(l_objName));
+            objNode = new TreeNode($"{l_objName}s ({objs.Length})");
+            treeView.Nodes.Add(objNode);
+            foreach (var l_obj in objs2) {
+                string l_name = l_obj.getName();
+                // Skip if filtered
+                if (searchTerm != "" && l_name.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) < 0) continue;
+
+                TreeNode l_node = new TreeNode(l_name);
+                l_node.Tag = l_obj;
+                objNode.Nodes.Add(l_node);
+            }
         }
 
         /// <summary>Add geometry lower order features in the given treeview option</summary>
