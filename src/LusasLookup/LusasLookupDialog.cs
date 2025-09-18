@@ -413,7 +413,7 @@ namespace LusasLookup {
             // Inspection Lines
             l_objName = "Beam/Shell Slicing";
             var objs2 = CastObject<IFBeamShellSlice>.arrayFromArrayObject(m_modeller.db().getObjects(l_objName));
-            objNode = new TreeNode($"{l_objName}s ({objs.Length})");
+            objNode = new TreeNode($"{l_objName}s ({objs2.Length})");
             treeView.Nodes.Add(objNode);
             foreach (var l_obj in objs2) {
                 string l_name = l_obj.getName();
