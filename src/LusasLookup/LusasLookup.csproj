@@ -11,17 +11,43 @@
     <AssemblyName>LusasLookup</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <!-- Default LUSAS version; can be overridden by Configuration-specific PropertyGroups or by passing /p:LusasVersion=... -->
+    <LusasVersion>230</LusasVersion>
   </PropertyGroup>
   
+  <!-- Configuration-based LUSAS version mappings -->
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug_211' ">
+    <LusasVersion>211</LusasVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug_220' ">
+    <LusasVersion>220</LusasVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug_230' ">
+    <LusasVersion>230</LusasVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release_211' ">
+    <LusasVersion>211</LusasVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release_220' ">
+    <LusasVersion>220</LusasVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release_230' ">
+    <LusasVersion>230</LusasVersion>
+  </PropertyGroup>
+
+  <!-- Platform setup -->
   <PropertyGroup Condition="'$(Platform)' == 'Win32'">
-    <OutputPath>C:\ProgramData\Lusas220\x86\Modules\</OutputPath>
+    <OutputPath>C:\ProgramData\LUSAS$(LusasVersion)\x86\Modules\</OutputPath>
     <StartAction>Program</StartAction>
-    <StartProgram>C:\Program Files %28x86%29\LUSAS220\Programs %28x86%29\lusas_m.exe</StartProgram>
+    <StartProgram>C:\Program Files (x86)\LUSAS$(LusasVersion)\Programs (x86)\lusas_m.exe</StartProgram>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Platform)' == 'x64'">
-    <OutputPath>C:\ProgramData\Lusas220\x64\Modules\</OutputPath>
+    <OutputPath>C:\ProgramData\LUSAS$(LusasVersion)\x64\Modules\</OutputPath>
     <StartAction>Program</StartAction>
-    <StartProgram>C:\Program Files\LUSAS220\Programs\lusas_m.exe</StartProgram>
+    <StartProgram>C:\Program Files\LUSAS$(LusasVersion)\Programs\lusas_m.exe</StartProgram>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <!-- Alternative OutputPath for user-specific installation
   <PropertyGroup>
@@ -29,23 +55,16 @@
   </PropertyGroup>
   -->
   
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+  <PropertyGroup Condition="$(Configuration.StartsWith('Debug'))">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+  <PropertyGroup Condition="$(Configuration.StartsWith('Release'))">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <DefineConstants>TRACE</DefineConstants>
-  </PropertyGroup>
-  
-  <PropertyGroup Condition="'$(Platform)' == 'Win32'">
-    <PlatformTarget>x86</PlatformTarget>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Platform)' == 'x64'">
-    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   
   <PropertyGroup>
@@ -59,19 +78,19 @@
   <ItemGroup Condition="'$(Platform)' == 'Win32'">
     <Reference Include="Common">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\LUSAS220\Programs (x86)\Common.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\LUSAS$(LusasVersion)\Programs (x86)\Common.dll</HintPath>
       <CopyLocal>False</CopyLocal>
       <Private>False</Private>
     </Reference>
     <Reference Include="KSharedEnum">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\LUSAS220\Programs (x86)\KSharedEnum.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\LUSAS$(LusasVersion)\Programs (x86)\KSharedEnum.dll</HintPath>
       <CopyLocal>False</CopyLocal>
       <Private>False</Private>
     </Reference>
     <Reference Include="Lusas.Interop">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\LUSAS220\Programs (x86)\Lusas.Interop.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\LUSAS$(LusasVersion)\Programs (x86)\Lusas.Interop.dll</HintPath>
       <CopyLocal>False</CopyLocal>
       <Private>False</Private>
     </Reference>
@@ -80,19 +99,19 @@
   <ItemGroup Condition="'$(Platform)' == 'x64'">
     <Reference Include="Common">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files\LUSAS220\Programs\Common.dll</HintPath>
+      <HintPath>C:\Program Files\LUSAS$(LusasVersion)\Programs\Common.dll</HintPath>
       <CopyLocal>False</CopyLocal>
       <Private>False</Private>
     </Reference>
     <Reference Include="KSharedEnum">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files\LUSAS220\Programs\KSharedEnum.dll</HintPath>
+      <HintPath>C:\Program Files\LUSAS$(LusasVersion)\Programs\KSharedEnum.dll</HintPath>
       <CopyLocal>False</CopyLocal>
       <Private>False</Private>
     </Reference>
     <Reference Include="Lusas.Interop">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files\LUSAS220\Programs\Lusas.Interop.dll</HintPath>
+      <HintPath>C:\Program Files\LUSAS$(LusasVersion)\Programs\Lusas.Interop.dll</HintPath>
       <CopyLocal>False</CopyLocal>
       <Private>False</Private>
     </Reference>
