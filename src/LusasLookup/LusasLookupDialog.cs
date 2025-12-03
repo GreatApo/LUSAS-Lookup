@@ -327,8 +327,12 @@ namespace LusasLookup {
                 }
             }
 
-            // Get all attributes
-            IFAttribute[] attrs = CastObject<IFAttribute>.arrayFromArrayObject(m_modeller.db().getAttributes_Ext("all"));
+            // Get all attributes (+utilities)
+            IFAttribute[] allAttrs = CastObject<IFAttribute>.arrayFromArrayObject(m_modeller.db().getAttributes_Ext("all"));
+
+            // Attributes
+            // (from all, remove the utilities and those that have no type, e.g. IFGraph)
+            IFAttribute[] attrs = allAttrs.Where(a => a.getAttributeType() != null && a.canAssign()).ToArray();
             TreeNode attsNode = new TreeNode($"Attributes ({attrs.Length})");
             treeView.Nodes.Add(attsNode);
             foreach (var l_attr in attrs) {
@@ -344,7 +348,39 @@ namespace LusasLookup {
                     attsNode.Nodes.Add(target_cat_node);
                 }
 
+                // Get an attribute name to show
                 string l_name = l_attr.getIDAndName();
+
+                // Skip if filtered
+                if (searchTerm != "" && l_name.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) < 0) continue;
+
+                TreeNode l_node = new TreeNode(l_name);
+                l_node.Tag = l_attr;
+                target_cat_node.Nodes.Add(l_node);
+            }
+
+            // Utilities
+            IFAttribute[] utilities = allAttrs.Except(attrs).ToArray();
+            TreeNode utilNode = new TreeNode($"Utilities ({utilities.Length})");
+            treeView.Nodes.Add(utilNode);
+            foreach (var l_attr in utilities) {
+                // Get attribute type
+                string attrType = l_attr.getAttributeType();
+
+                TreeNode target_cat_node = null;
+                foreach (TreeNode l_cat_node in utilNode.Nodes) {
+                    if (l_cat_node.Text != attrType) continue;
+                    target_cat_node = l_cat_node;
+                    break;
+                }
+                if (target_cat_node == null) {
+                    target_cat_node = new TreeNode(attrType);
+                    utilNode.Nodes.Add(target_cat_node);
+                }
+
+                // Get an attribute name to show
+                string l_name = l_attr.getIDAndName();
+
                 // Skip if filtered
                 if (searchTerm != "" && l_name.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) < 0) continue;
 
