@@ -104,7 +104,7 @@ namespace LusasLookup {
                 // Try to load some of the method returns
                 if (typesToLoad.Contains(retType) &&
                     !methodName.StartsWith("delete") && !methodName.StartsWith("solve") &&
-                    (retType != "Boolean" || methodName.StartsWith("is") || methodName.StartsWith("has") || methodName.StartsWith("needs")) &&
+                    (retType != "Boolean" || methodName.StartsWith("is") || methodName.StartsWith("has") || methodName.StartsWith("needs") || methodName.StartsWith("can")) &&
                     methodName != "showEditDlg()" &&
                     !method.GetParameters().Any(p => !p.IsOptional)) {
                     try {
