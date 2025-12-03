@@ -81,7 +81,7 @@ namespace LusasLookup {
             var methods = type.GetMethods(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
 
             // Update object Name
-            var getNameMethod = methods.FirstOrDefault(m => m.Name == "getName");
+            MethodInfo getNameMethod = methods.FirstOrDefault(m => m.Name == "getName" || m.Name == "getTitle");
             if (getNameMethod != null) {
                 var objName = getNameMethod.Invoke(targetObjs, new object[getNameMethod.GetParameters().Length]);
                 txtViewObj.Text = $"{objName} ({type.Name})";
@@ -336,7 +336,9 @@ namespace LusasLookup {
             TreeNode attsNode = new TreeNode($"Attributes ({attrs.Length})");
             treeView.Nodes.Add(attsNode);
             foreach (var l_attr in attrs) {
+                // Get attribute type
                 string attrType = l_attr.getAttributeType();
+
                 TreeNode target_cat_node = null;
                 foreach (TreeNode l_cat_node in attsNode.Nodes) {
                     if (l_cat_node.Text != attrType) continue;
@@ -350,6 +352,7 @@ namespace LusasLookup {
 
                 // Get an attribute name to show
                 string l_name = l_attr.getIDAndName();
+                if (l_name == null) l_name = "null";
 
                 // Skip if filtered
                 if (searchTerm != "" && l_name.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) < 0) continue;
@@ -366,6 +369,13 @@ namespace LusasLookup {
             foreach (var l_attr in utilities) {
                 // Get attribute type
                 string attrType = l_attr.getAttributeType();
+                if (attrType == null) {
+                    if (l_attr is IFGraphWizard) {
+                        attrType = "Graph Wizard";
+                    } else {
+                        attrType = "null";
+                    }
+                }
 
                 TreeNode target_cat_node = null;
                 foreach (TreeNode l_cat_node in utilNode.Nodes) {
@@ -380,6 +390,14 @@ namespace LusasLookup {
 
                 // Get an attribute name to show
                 string l_name = l_attr.getIDAndName();
+                if (l_name == null) {
+                    if (l_attr is IFGraphWizard l_graph) {
+                        // Fix for graphs wizard, use getTitle() instead
+                        l_name = l_graph.getTitle();
+                    } else {
+                        l_name = "null";
+                    }
+                }
 
                 // Skip if filtered
                 if (searchTerm != "" && l_name.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) < 0) continue;
