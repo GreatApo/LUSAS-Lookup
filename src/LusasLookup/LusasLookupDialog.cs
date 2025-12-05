@@ -137,6 +137,8 @@ namespace LusasLookup {
                     var methodName = method.Name + "()";
                     var retType = method.ReturnType.Name;
 
+                    if (methodName == "onFileOpen()") continue;
+
                     bool isSafeBoolQuery =
                         retType == "Boolean" &&
                         (method.Name.StartsWith("is") || method.Name.StartsWith("has") || method.Name.StartsWith("needs") || method.Name.StartsWith("can"));
@@ -288,8 +290,10 @@ namespace LusasLookup {
             treeView.Nodes.Clear();
 
             // Get all volumes/surfaces/lines/points and populate the tree
+            List<IFGeometry> allGeoms = new List<IFGeometry>();
             foreach (var l_geomName in new string[] { "Volume", "Surface", "Line", "Point" }) {
-                var geoms = CastObject<IFGeometry>.arrayFromArrayObject(m_modeller.db().getObjects(l_geomName));
+                IFGeometry[] geoms = CastObject<IFGeometry>.arrayFromArrayObject(m_modeller.db().getObjects(l_geomName));
+                allGeoms.AddRange(geoms);
 
                 TreeNode l_mainNode = new TreeNode($"{l_geomName}s ({geoms.Length})");
                 treeView.Nodes.Add(l_mainNode);
@@ -390,7 +394,7 @@ namespace LusasLookup {
             }
 
             // Analyses
-            var analyses = m_modeller.db().getAnalyses_Ext();
+            IFAnalysisBaseClass[] analyses = m_modeller.db().getAnalyses_Ext();
             TreeNode analysesNode = new TreeNode($"Analyses ({analyses.Length})");
             treeView.Nodes.Add(analysesNode);
             foreach (var l_analysis in analyses) {
@@ -404,7 +408,7 @@ namespace LusasLookup {
             }
 
             // Loadsets
-            var loadsets = CastObject<IFLoadset>.arrayFromArrayObject(m_modeller.db().getLoadsets("all"));
+            IFLoadset[] loadsets = CastObject<IFLoadset>.arrayFromArrayObject(m_modeller.db().getLoadsets("all"));
             TreeNode loadsetsNode = new TreeNode($"Loadsets ({loadsets.Length})");
             treeView.Nodes.Add(loadsetsNode);
             foreach (var l_loadset in loadsets) {
@@ -418,7 +422,7 @@ namespace LusasLookup {
             }
 
             // Groups
-            var groups = m_modeller.db().getGroups_Ext();
+            IFGroup[] groups = m_modeller.db().getGroups_Ext();
             TreeNode groupsNode = new TreeNode($"Groups ({groups.Length})");
             treeView.Nodes.Add(groupsNode);
             foreach (var l_group in groups) {
@@ -434,7 +438,7 @@ namespace LusasLookup {
             // Other objects
             // Reference Paths
             string l_objName = "Reference Path";
-            var objs = CastObject<IFReferencePath>.arrayFromArrayObject(m_modeller.db().getObjects(l_objName));
+            IFReferencePath[] objs = CastObject<IFReferencePath>.arrayFromArrayObject(m_modeller.db().getObjects(l_objName));
             TreeNode objNode = new TreeNode($"{l_objName}s ({objs.Length})");
             treeView.Nodes.Add(objNode);
             foreach (var l_obj in objs) {
@@ -448,11 +452,61 @@ namespace LusasLookup {
             }
             // Inspection Lines
             l_objName = "Beam/Shell Slicing";
-            var objs2 = CastObject<IFBeamShellSlice>.arrayFromArrayObject(m_modeller.db().getObjects(l_objName));
+            IFBeamShellSlice[] objs2 = CastObject<IFBeamShellSlice>.arrayFromArrayObject(m_modeller.db().getObjects(l_objName));
             objNode = new TreeNode($"{l_objName}s ({objs2.Length})");
             treeView.Nodes.Add(objNode);
             foreach (var l_obj in objs2) {
                 string l_name = l_obj.getName();
+                // Skip if filtered
+                if (searchTerm != "" && l_name.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) < 0) continue;
+
+                TreeNode l_node = new TreeNode(l_name);
+                l_node.Tag = l_obj;
+                objNode.Nodes.Add(l_node);
+            }
+
+            // Other
+            List<object> otherObjs = CastObject<object>.arrayFromArrayObject(m_modeller.db().getObjects("all")).ToList();
+            otherObjs = otherObjs.Except(allGeoms).Except(objs).Except(objs2).ToList();
+            // Add the toolbar
+            otherObjs.Insert(0, m_modeller.getToolbars());
+            // Add layers
+            if (m_modeller.view().existsVisualiseLayer()) otherObjs.Insert(0, m_modeller.view().getVisualiseLayer());
+            if (m_modeller.view().existsVectorsLayer()) otherObjs.Insert(0, m_modeller.view().getVectorsLayer());
+            if (m_modeller.view().existsValuesLayer()) otherObjs.Insert(0, m_modeller.view().getValuesLayer());
+            if (m_modeller.view().existsUtilitiesLayer()) otherObjs.Insert(0, m_modeller.view().getUtilitiesLayer());
+            if (m_modeller.view().existsMeshLayer()) otherObjs.Insert(0, m_modeller.view().getMeshLayer());
+            if (m_modeller.view().existsLabelLayer()) otherObjs.Insert(0, m_modeller.view().getLabelLayer());
+            if (m_modeller.view().existsGeometryLayer()) otherObjs.Insert(0, m_modeller.view().getGeometryLayer());
+            if (m_modeller.view().existsDiagramsLayer()) otherObjs.Insert(0, m_modeller.view().getDiagramsLayer());
+            if (m_modeller.view().existsDeformLayer()) otherObjs.Insert(0, m_modeller.view().getDeformLayer());
+            if (m_modeller.view().existsContoursLayer()) otherObjs.Insert(0, m_modeller.view().getContoursLayer());
+            if (m_modeller.view().existsAttributesLayer()) otherObjs.Insert(0, m_modeller.view().getAttributesLayer());
+            if (m_modeller.view().existsAnnotationLayer()) otherObjs.Insert(0, m_modeller.view().getAnnotationLayer());
+            // Add modeller
+            otherObjs.Insert(0, m_modeller);
+            // Add to treeview
+            objNode = new TreeNode($"Others ({otherObjs.Count})");
+            treeView.Nodes.Add(objNode);
+            foreach (var l_obj in otherObjs) {
+
+                // Reflection with caching
+                Type type = ComTypeHelper.GetCOMObjectType(l_obj);
+                var flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+
+                // Cache members
+                MethodInfo[] methods = type.GetMethods(flags);
+
+                // Object name
+                var getNameMethod = methods.FirstOrDefault(m => m.Name == "getName" || m.Name == "getTitle");
+                string l_name;
+                if (getNameMethod != null) {
+                    object objName = getNameMethod.GetValue(l_obj);
+                    l_name = $"{objName ?? "Unnamed"} ({type.Name})";
+                } else {
+                    l_name = type.Name;
+                }
+
                 // Skip if filtered
                 if (searchTerm != "" && l_name.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) < 0) continue;
 
