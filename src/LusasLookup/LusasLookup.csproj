@@ -130,6 +130,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ComTypeHelper.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="LusasLookupDialog.cs">
       <SubType>Form</SubType>
     </Compile>
