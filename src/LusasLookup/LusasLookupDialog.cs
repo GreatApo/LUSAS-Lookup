@@ -75,6 +75,8 @@ namespace LusasLookup {
             txtViewObj.Text = "Loading...";
             this.Cursor = Cursors.WaitCursor;
 
+            // Change Select / Edit button text
+            btnHighlightChangeText(targetObjs);
 
             dgvObjectMethods.SuspendLayout();
             try {
@@ -543,7 +545,23 @@ namespace LusasLookup {
                     dgvObjectMethods.CurrentCell = null;
                 }
             }
+        }
 
+        /// <summary>Change the text of the "Select"/"Edit" button.</summary>
+        private void btnHighlightChangeText(object targetObjs) {
+
+            if (targetObjs is IFDatabaseMember) {
+                btnHighlight.Text = "Select";
+                btnHighlight.Enabled = true;
+
+            } else if (targetObjs is IFAttribute) {
+                btnHighlight.Text = "Edit";
+                btnHighlight.Enabled = true;
+
+            } else {
+                btnHighlight.Enabled = false;
+
+            }
         }
 
         #region "Events"
@@ -551,6 +569,7 @@ namespace LusasLookup {
         /// <summary>Event triggered when a node in the tree view is clicked.</summary>
         private void TreeView_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e) {
             if (e.Node.Tag == null) return;
+
             // Populate table based on the object associated with the clicked node
             PopulateDataGridView(e.Node.Tag);
         }
@@ -565,13 +584,23 @@ namespace LusasLookup {
             FilterDataGridView();
         }
 
-        /// <summary>Event triggered when the "Select" button is clicked.</summary>
+        /// <summary>Event triggered when the "Select"/"Edit" button is clicked.</summary>
         private void btnHighlight_Click(object sender, EventArgs e) {
             if (treeView.SelectedNode == null) return;
+
             IFDatabaseMember member = treeView.SelectedNode.Tag as IFDatabaseMember;
-            if (member == null) return;
-            m_modeller.selection().remove("all");
-            m_modeller.selection().add(member);
+            if (member != null) {
+                m_modeller.selection().remove("all");
+                m_modeller.selection().add(member);
+                return;
+            }
+            ;
+
+            IFAttribute attr = treeView.SelectedNode.Tag as IFAttribute;
+            if (attr != null) {
+                attr.showEditDlg();
+                return;
+            }
         }
 
         //private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
