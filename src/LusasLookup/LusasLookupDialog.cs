@@ -5,6 +5,7 @@
 // LusasLookupDialog class implementation file
 //*******************************************************************
 
+using Lusas.Common.Attributes;
 using Lusas.Common.Extensions;
 using Lusas.LPI;
 using Lusas.Module;
@@ -23,7 +24,10 @@ namespace LusasLookup {
         private LusasLookupModule m_module; // Reference to the module 
         private IFModeller m_modeller; // Reference to Modeller
 
-        /// <summary>Constructs an instance of the safeprojectnameModule dialog</summary>
+        // Add a private BindingSource for the grid at class level
+        private BindingSource _gridBindingSource = new BindingSource();
+
+        /// <summary>Constructs an instance of the dialog</summary>
         /// <param name="lusasModule"></param>
         public LusasLookupDialog(LusasLookupModule lusasModule) : base(lusasModule) {
             m_module = lusasModule;
@@ -68,233 +72,209 @@ namespace LusasLookup {
         /// <summary>Populate table with object properties and methods</summary>
         /// <param name="targetObjs">Target object</param>
         private void PopulateDataGridView(object targetObjs) {
-            // Clear current table
             txtViewObj.Text = "Loading...";
-            dgvObjectMethods.Rows.Clear();
             this.Cursor = Cursors.WaitCursor;
 
-            // Suspend layout to improve performance during bulk row additions
+
             dgvObjectMethods.SuspendLayout();
+            try {
+                var previousAutoSize = dgvObjectMethods.AutoSizeColumnsMode;
+                var previousRowHeadersVisible = dgvObjectMethods.RowHeadersVisible;
 
-            Type type = ComTypeHelper.GetCOMObjectType(targetObjs);
-            var properties = type.GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
-            var methods = type.GetMethods(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+                dgvObjectMethods.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None;
+                dgvObjectMethods.RowHeadersVisible = false;
+                dgvObjectMethods.ReadOnly = true;
+                dgvObjectMethods.AllowUserToAddRows = false;
+                dgvObjectMethods.AllowUserToResizeRows = false;
+                dgvObjectMethods.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
 
-            // Update object Name
-            MethodInfo getNameMethod = methods.FirstOrDefault(m => m.Name == "getName" || m.Name == "getTitle");
-            if (getNameMethod != null) {
-                var objName = getNameMethod.Invoke(targetObjs, new object[getNameMethod.GetParameters().Length]);
-                txtViewObj.Text = $"{objName} ({type.Name})";
-            } else {
-                txtViewObj.Text = $"Unnamed object ({type.Name})";
-            }
+                // Clear existing binding
+                dgvObjectMethods.DataSource = null;
+                dgvObjectMethods.Rows.Clear();
+                dgvObjectMethods.Columns.Clear();
 
-            // Load properties
-            foreach (var property in properties) {
-                var value = property.GetValue(targetObjs);
-                dgvObjectMethods.Rows.Add(property.Name, property.PropertyType.Name, value?.ToString() ?? "Null");
-            }
+                var table = new System.Data.DataTable();
+                table.Columns.Add("Name", typeof(string));
+                table.Columns.Add("Type", typeof(string));
+                table.Columns.Add("Value", typeof(string));
 
-            // Load methods
-            string[] typesToLoad = new string[] { "Int32", "UInt32", "Int64", "UInt64", "Double", "String", "Boolean", "SByte" };
-            foreach (var method in methods) {
-                var methodName = method.Name + "()";
-                var retType = method.ReturnType.Name;
+                // Reflection with caching
+                Type type = ComTypeHelper.GetCOMObjectType(targetObjs);
+                var flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
 
-                // Try to load some of the method returns
-                if (typesToLoad.Contains(retType) &&
-                    !methodName.StartsWith("delete") && !methodName.StartsWith("solve") &&
-                    (retType != "Boolean" || methodName.StartsWith("is") || methodName.StartsWith("has") || methodName.StartsWith("needs") || methodName.StartsWith("can")) &&
-                    methodName != "showEditDlg()" &&
-                    !method.GetParameters().Any(p => !p.IsOptional)) {
-                    try {
-                        var value = method.Invoke(targetObjs, new object[method.GetParameters().Length]);
+                // Cache members
+                PropertyInfo[] properties = type.GetProperties(flags);
+                MethodInfo[] methods = type.GetMethods(flags);
 
-                        if (methodName == "getModificationTime()") {
-                            // Add value as date string at the end
-                            DateTime date = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-                            date = date.AddSeconds(Convert.ToInt32(value)); // TODO: Does not work for 32bit
-                            value = $"{value.ToString()} ({date.ToString()})"; //Add date as 2025-07-10 16:00:00
-                        }
-
-                        dgvObjectMethods.Rows.Add(methodName, retType, value?.ToString() ?? "Null");
-
-                    } catch {
-                        dgvObjectMethods.Rows.Add(methodName, retType, "error");
-                    }
-
-                } else if (methodName == "getModificationTime()") {
-                    try {
-                        // Create an object with the analysisOnly argument as true 
-                        var arguments = new object[method.GetParameters().Length];
-                        arguments[0] = true;
-                        // Get value
-                        var value = method.Invoke((object)targetObjs, arguments);
-
-                        // Add value as date string at the end
-                        DateTime date = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-                        date = date.AddSeconds(Convert.ToInt32(value));
-                        value = $"{value.ToString()} ({date.ToString()})"; //Add date as 2025-07-10 16:00:00
-
-                        dgvObjectMethods.Rows.Add(methodName, retType, value?.ToString() ?? "Null");
-                    } catch {
-                        dgvObjectMethods.Rows.Add(methodName, retType, "error");
-                    }
-
+                // Object title
+                var getNameMethod = methods.FirstOrDefault(m => m.Name == "getName" || m.Name == "getTitle");
+                if (getNameMethod != null) {
+                    object objName = getNameMethod.GetValue(targetObjs);
+                    txtViewObj.Text = $"{objName ?? "Unnamed"} ({type.Name})";
                 } else {
-                    dgvObjectMethods.Rows.Add(methodName, retType, "Method");
+                    txtViewObj.Text = $"Unnamed object ({type.Name})";
                 }
-            }
 
-            // Print object saved values
-            MethodInfo getValueNamesMethod = methods.FirstOrDefault(m => m.Name == "getValueNames");
-            if (getValueNamesMethod != null) {
-                // Get available methods
-                MethodInfo getValueUnitsMethod = methods.FirstOrDefault(m => m.Name == "getValueUnits");
-                MethodInfo getValueMethod = methods.FirstOrDefault(m => m.Name == "getValue");
-
-                // Read value names
-                string[] savedValueNames = CastObject<string>.arrayFromArrayObject(getValueNamesMethod.Invoke((object)targetObjs, new object[getValueNamesMethod.GetParameters().Length]));
-
-                // Loop and print values
-                foreach (var l_name in savedValueNames) {
+                // Load properties (avoid COM calls that throw; swallow individually)
+                foreach (var property in properties) {
+                    string name = property.Name;
+                    string ptype = property.PropertyType.Name;
+                    string valStr;
                     try {
-                        // Create an object with the passed arguments and set the first as the value name
-                        var arguments = new object[getValueMethod.GetParameters().Length];
-                        arguments[0] = l_name;
-                        // Get value
-                        var value = getValueMethod.Invoke((object)targetObjs, arguments);
+                        var value = property.GetValue(targetObjs);
+                        valStr = value?.ToString() ?? "Null";
+                    } catch {
+                        valStr = "error";
+                    }
+                    table.Rows.Add(name, ptype, valStr);
+                }
 
-                        // Get value type
-                        string varType = value?.GetType().ToString() ?? "Null";
-                        if (varType.StartsWith("System.")) varType = varType.Substring(7);
+                // Load methods (that are possible to load)
+                string[] typesToLoad = { "Int32", "UInt32", "Int64", "UInt64", "Double", "String", "Boolean", "SByte" };
+                foreach (var method in methods) {
+                    var methodName = method.Name + "()";
+                    var retType = method.ReturnType.Name;
 
-                        // Get value units
-                        arguments = new object[getValueUnitsMethod.GetParameters().Length];
-                        arguments[0] = l_name;
-                        var units = getValueUnitsMethod.Invoke((object)targetObjs, arguments);
+                    bool isSafeBoolQuery =
+                        retType == "Boolean" &&
+                        (method.Name.StartsWith("is") || method.Name.StartsWith("has") || method.Name.StartsWith("needs") || method.Name.StartsWith("can"));
 
-                        // Print based on type
-                        if (varType == "Object[]") {
-                            // Try to iterate array
-                            int i = 0;
-                            foreach (var l_value in (object[])value) {
-                                var l_value_i = l_value;
+                    bool tryInvoke =
+                        typesToLoad.Contains(retType) &&
+                        !methodName.StartsWith("delete") &&
+                        !methodName.StartsWith("solve") &&
+                        (retType != "Boolean" || isSafeBoolQuery) &&
+                        methodName != "showEditDlg()" &&
+                        !method.GetParameters().Any(p => !p.IsOptional);
 
-                                // Get value type
-                                string l_varType = l_value?.GetType().ToString() ?? "Null";
-                                if (l_varType.StartsWith("System.")) l_varType = l_varType.Substring(7);
+                    if (tryInvoke) {
+                        try {
+                            var value = method.GetValue(targetObjs);
+                            if (methodName == "getModificationTime()") {
+                                var date = new DateTime(1970, 1, 1).AddSeconds(Convert.ToInt32(value));
+                                value = $"{value} ({date})";
+                            }
+                            table.Rows.Add(methodName, retType, value?.ToString() ?? "Null");
+                            continue;
+                        } catch {
+                            table.Rows.Add(methodName, retType, "error");
+                            continue;
+                        }
+                    }
+
+                    // Default: just list method signature as "Method"
+                    table.Rows.Add(methodName, retType, "Method");
+                }
+
+                // Print object saved values
+                var getValueNamesMethod = methods.FirstOrDefault(m => m.Name == "getValueNames");
+                if (getValueNamesMethod != null) {
+                    // Get available methods
+                    var getValueUnitsMethod = methods.FirstOrDefault(m => m.Name == "getValueUnits");
+                    var getValueMethod = methods.FirstOrDefault(m => m.Name == "getValue");
+
+                    // Read value names
+                    string[] savedValueNames = CastObject<string>.arrayFromArrayObject(getValueNamesMethod.GetValue(targetObjs));
+
+                    foreach (var l_name in savedValueNames) {
+                        try {
+                            var value = getValueMethod.GetValue(targetObjs, l_name);
+                            var units = getValueUnitsMethod.GetValue(targetObjs, l_name);
+
+                            // Handle all as arrays
+                            object[] values;
+                            string varType = value.GetTypeAsString();
+                            if (varType == "Object[]") {
+                                values = (object[])value;
+                            } else {
+                                values = new object[] { value };
+                            }
+
+                            // Loop saved data
+                            for (int i = 0; i < values.Length; i++) {
+                                var l_value = values[i];
+                                string l_varType = values.Length == 1 ? varType : l_value.GetTypeAsString();
 
                                 // Add units in type
-                                if (units != null && units.ToString() != "None") l_varType += $" ({units.ToString()})";
+                                if (units != null && units.ToString() != "None") l_varType += $" ({units})";
 
-                                // Read saved COM object
-                                if (l_varType == "__ComObject") {
-                                    Type t_type = ComTypeHelper.GetCOMObjectType(l_value);
-                                    if (t_type != null) l_varType = t_type.ToString();
-                                    if (l_varType.StartsWith("Lusas.LPI.")) {
-                                        l_varType = l_varType.Substring(10);
-                                        var t_methods = t_type.GetMethods(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
-                                        MethodInfo t_getNameMethod = t_methods.First(m => m.Name == "getName");
-                                        var name = t_getNameMethod.Invoke((object)l_value, new object[t_getNameMethod.GetParameters().Length]);
-                                        if (name != null) l_value_i = name.ToString();
+                                // Load LUSAS COM object name
+                                if (l_varType.StartsWith("Lusas.LPI.")) {
+                                    l_varType = l_varType.Substring(10);
+                                    var t_type = ComTypeHelper.GetCOMObjectType(l_value);
+                                    var t_methods = t_type.GetMethods(flags);
+                                    var t_getNameMethod = t_methods.FirstOrDefault(m => m.Name == "getName" || m.Name == "getTitle");
+                                    if (t_getNameMethod != null) {
+                                        var name = t_getNameMethod.GetValue(l_value);
+                                        if (name != null) l_value = name.ToString();
                                     }
                                 }
 
-                                dgvObjectMethods.Rows.Add($"getValue('{l_name}')[{i}]", l_varType, l_value_i?.ToString() ?? "Null");
-                                i++;
+                                string l_name_counter = values.Length > 1 ? $"[{i}]" : "";
+                                table.Rows.Add($"getValue('{l_name}'){l_name_counter}", l_varType, l_value?.ToString() ?? "Null");
                             }
 
-                        } else {
-                            // Single value
-
-                            // Read saved COM object
-                            if (varType == "__ComObject") {
-                                Type t_type = ComTypeHelper.GetCOMObjectType(value);
-                                if (t_type != null) varType = t_type.ToString();
-                                if (varType.StartsWith("Lusas.LPI.")) {
-                                    varType = varType.Substring(10);
-                                    var t_methods = t_type.GetMethods(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
-                                    MethodInfo t_getNameMethod = t_methods.First(m => m.Name == "getName");
-                                    var name = t_getNameMethod.Invoke((object)value, new object[t_getNameMethod.GetParameters().Length]);
-                                    if (name != null) value = name.ToString();
-                                }
-                            }
-
-                            // Add units in type
-                            if (units != null && units.ToString() != "None") varType += $" ({units.ToString()})";
-
-                            dgvObjectMethods.Rows.Add($"getValue('{l_name}')", varType, value?.ToString() ?? "Null");
+                        } catch {
+                            table.Rows.Add($"getValue('{l_name}')", "n/a", "error");
                         }
-
-
-                    } catch {
-                        dgvObjectMethods.Rows.Add($"getValue('{l_name}')", "n/a", "error");
                     }
                 }
-            }
 
-            // Load fields
-            //var fields = type.GetFields(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
-            //foreach (var field in fields)
-            //{
-            //    dataGridView1.Rows.Add(field.Name, "", "Field");
-            //}
+                // Manual calculations
+                var objset = targetObjs as IFObjectSet;
+                if (objset != null) {
+                    double vlmsVolume = CastObject<IFVolume>.arrayFromArrayObject(objset.getObjects("volume"))
+                        .Select(s => s.getVolume()).DefaultIfEmpty(0).Sum();
+                    table.Rows.Add("Total volumes volume", "Calculation", vlmsVolume.ToString());
 
-            // Add manual calculations
-            IFObjectSet objset = targetObjs as IFObjectSet;
-            if (objset != null) {
-                // Total volume
-                double vlmsVolume = CastObject<IFVolume>.arrayFromArrayObject(objset.getObjects("volume")).Select(s => s.getVolume()).DefaultIfEmpty(0).Sum();
-                dgvObjectMethods.Rows.Add("Total volumes volume", "Calculation", vlmsVolume.ToString());
-                // Total surface area
-                double surfsArea = objset.getSurfaces_Ext().Select(s => s.getArea()).DefaultIfEmpty(0).Sum();
-                dgvObjectMethods.Rows.Add("Total surfaces area", "Calculation", surfsArea.ToString());
-                // Total lines length
-                double linesLength = objset.getLines_Ext().Select(s => s.getLineLength()).DefaultIfEmpty(0).Sum();
-                dgvObjectMethods.Rows.Add("Total lines length", "Calculation", linesLength.ToString());
+                    double surfsArea = objset.getSurfaces_Ext().Select(s => s.getArea()).DefaultIfEmpty(0).Sum();
+                    table.Rows.Add("Total surfaces area", "Calculation", surfsArea.ToString());
 
-                // Total elements volume / area / length
-                long elms3D = 0;
-                long elms2D = 0;
-                long elms1D = 0;
-                double elmsLength = 0;
-                double elmsArea = 0;
-                double elmsVolume = 0;
-                foreach (IFElement elm in objset.getElements_Ext()) {
-                    double l_length = elm.getLength();
-                    if (l_length > 0) {
-                        elms1D += 1;
-                        elmsLength += l_length;
-                        continue;
+                    double linesLength = objset.getLines_Ext().Select(s => s.getLineLength()).DefaultIfEmpty(0).Sum();
+                    table.Rows.Add("Total lines length", "Calculation", linesLength.ToString());
+
+                    long elms3D = 0, elms2D = 0, elms1D = 0;
+                    double elmsLength = 0, elmsArea = 0, elmsVolume = 0;
+                    foreach (IFElement elm in objset.getElements_Ext()) {
+                        double l_length = elm.getLength();
+                        if (l_length > 0) {
+                            elms1D += 1;
+                            elmsLength += l_length;
+                            continue;
+                        }
+                        double l_area = elm.getArea();
+                        if (l_area > 0) {
+                            elms2D += 1;
+                            elmsArea += l_area;
+                            continue;
+                        }
+                        double l_volume = elm.getVolume();
+                        if (l_area > 0) {
+                            elms3D += 1;
+                            elmsVolume += l_volume;
+                            continue;
+                        }
                     }
-                    double l_area = elm.getArea();
-                    if (l_area > 0) {
-                        elms2D += 1;
-                        elmsArea += l_area;
-                        continue;
-                    }
-                    double l_volume = elm.getVolume();
-                    if (l_area > 0) {
-                        elms3D += 1;
-                        elmsVolume += l_volume;
-                        continue;
-                    }
-                    // It shouldn't reach this point
+                    table.Rows.Add("Number of 1D elements", "Calculation", elms1D.ToString());
+                    table.Rows.Add("Total length of elements", "Calculation", elmsLength.ToString());
+                    table.Rows.Add("Number of 2D elements", "Calculation", elms2D.ToString());
+                    table.Rows.Add("Total area of elements", "Calculation", elmsArea.ToString());
+                    table.Rows.Add("Number of 3D elements", "Calculation", elms3D.ToString());
+                    table.Rows.Add("Total volume of elements", "Calculation", elmsVolume.ToString());
                 }
-                dgvObjectMethods.Rows.Add("Number of 1D elements", "Calculation", elms1D.ToString());
-                dgvObjectMethods.Rows.Add("Total length of elements", "Calculation", elmsLength.ToString());
-                dgvObjectMethods.Rows.Add("Number of 2D elements", "Calculation", elms2D.ToString());
-                dgvObjectMethods.Rows.Add("Total area of elements", "Calculation", elmsArea.ToString());
-                dgvObjectMethods.Rows.Add("Number of 3D elements", "Calculation", elms3D.ToString());
-                dgvObjectMethods.Rows.Add("Total volume of elements", "Calculation", elmsVolume.ToString());
+
+                // Bind via BindingSource
+                _gridBindingSource.DataSource = table.DefaultView; // DataView supports Filter
+                dgvObjectMethods.DataSource = _gridBindingSource;
+
+                dgvObjectMethods.RowHeadersVisible = previousRowHeadersVisible;
+                dgvObjectMethods.AutoSizeColumnsMode = previousAutoSize;
+            } finally {
+                dgvObjectMethods.ResumeLayout();
+                this.Cursor = Cursors.Default;
             }
 
-            this.Cursor = Cursors.Default;
-            // Resume layout after all rows have been added
-            dgvObjectMethods.ResumeLayout();
-
-            // Filter the DataGridView
+            // Apply filter after population
             FilterDataGridView();
         }
 
@@ -531,41 +511,39 @@ namespace LusasLookup {
         /// </remarks>
         private void FilterDataGridView() {
             string searchTerm = txtSearchMethods.Text.Trim();
-            var valuesOnly = cbValuesOnly.Checked;
+            bool valuesOnly = cbValuesOnly.Checked;
 
-            // Suspend layout to improve performance during bulk row additions
-            dgvObjectMethods.SuspendLayout();
+            // Build DataView filter instead of hiding rows
+            // Escape single quotes for LIKE
+            string esc(string s) => s.Replace("'", "''");
 
-            foreach (DataGridViewRow row in dgvObjectMethods.Rows) {
-                // Hide rows that are not values only
-                if (valuesOnly && row.Cells[2].Value.ToString() == "Method") {
-                    row.Visible = false;
-                    continue;
-                }
+            var clauses = new List<string>();
 
-                // Check if not searching
-                if (searchTerm == "") {
-                    row.Visible = true;
-                    continue;
-                }
-
-                bool rowVisible = false;
-
-                // Check if any cell in the row contains the search term
-                foreach (DataGridViewCell cell in row.Cells) {
-                    if (cell.Value != null &&
-                        cell.Value.ToString().IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0) {
-                        rowVisible = true;
-                        break;
-                    }
-                }
-
-                // Set the row visibility based on whether it matched the search
-                row.Visible = rowVisible;
+            if (valuesOnly) {
+                clauses.Add("Value <> 'Method'");
             }
 
-            // Resume layout after all rows have been added
-            dgvObjectMethods.ResumeLayout();
+            if (!string.IsNullOrEmpty(searchTerm)) {
+                string like = $"%{esc(searchTerm)}%";
+                // OR across all columns
+                clauses.Add($"(Name LIKE '{like}' OR Type LIKE '{like}' OR Value LIKE '{like}')");
+            }
+
+            string filter = string.Join(" AND ", clauses);
+
+            // Apply to BindingSource/DataView
+            var view = _gridBindingSource.DataSource as System.Data.DataView;
+            if (view != null) {
+                view.RowFilter = filter;
+                // Move current to a visible row to avoid CurrencyManager pointing to a filtered-out row
+                if (_gridBindingSource.Count > 0) {
+                    _gridBindingSource.Position = 0;
+                } else {
+                    dgvObjectMethods.ClearSelection();
+                    dgvObjectMethods.CurrentCell = null;
+                }
+            }
+
         }
 
         #region "Events"
