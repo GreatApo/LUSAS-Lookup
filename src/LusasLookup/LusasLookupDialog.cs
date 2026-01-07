@@ -289,9 +289,48 @@ namespace LusasLookup {
             // Clear the TreeView
             treeView.Nodes.Clear();
 
+            // Modeller/Project/Databases
+            List<object> mainObjs = new List<object>();
+            // Add modeller
+            mainObjs.Add(m_modeller);
+            // Add project
+            mainObjs.Add(m_modeller.getProject());
+            // Add Databases
+            mainObjs.Add(m_modeller.getProject().getGoverningModel());
+            mainObjs.AddRange(CastObject<IFDatabase>.arrayFromArrayObject(m_modeller.getProject().getSubModels()));
+            // Create tree view node
+            TreeNode modelNode = new TreeNode($"Model ({mainObjs.Count})");
+            treeView.Nodes.Add(modelNode);
+            foreach (var l_obj in mainObjs) {
+
+                // Reflection with caching
+                Type type = ComTypeHelper.GetCOMObjectType(l_obj);
+                var flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
+
+                // Cache members
+                MethodInfo[] methods = type.GetMethods(flags);
+
+                // Object name
+                var getNameMethod = methods.FirstOrDefault(m => m.Name == "getName" || m.Name == "getTitle");
+                string l_name;
+                if (getNameMethod != null) {
+                    object objName = getNameMethod.GetValue(l_obj);
+                    l_name = $"{objName ?? "Unnamed"} ({type.Name})";
+                } else {
+                    l_name = type.Name;
+                }
+
+                // Skip if filtered
+                if (searchTerm != "" && l_name.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) < 0) continue;
+
+                TreeNode l_node = new TreeNode(l_name);
+                l_node.Tag = l_obj;
+                modelNode.Nodes.Add(l_node);
+            }
+
             // Get all volumes/surfaces/lines/points and populate the tree
             List<IFGeometry> allGeoms = new List<IFGeometry>();
-            foreach (var l_geomName in new string[] { "Volume", "Surface", "Line", "Point" }) {
+            foreach (var l_geomName in new string[] { "Volume", "Surface", "Combined Line", "Line", "Point" }) {
                 IFGeometry[] geoms = CastObject<IFGeometry>.arrayFromArrayObject(m_modeller.db().getObjects(l_geomName));
                 allGeoms.AddRange(geoms);
 
@@ -435,7 +474,6 @@ namespace LusasLookup {
                 groupsNode.Nodes.Add(l_node);
             }
 
-            // Other objects
             // Reference Paths
             string l_objName = "Reference Path";
             IFReferencePath[] objs = CastObject<IFReferencePath>.arrayFromArrayObject(m_modeller.db().getObjects(l_objName));
@@ -467,7 +505,7 @@ namespace LusasLookup {
 
             // Other
             List<object> otherObjs = CastObject<object>.arrayFromArrayObject(m_modeller.db().getObjects("all")).ToList();
-            otherObjs = otherObjs.Except(allGeoms).Except(objs).Except(objs2).ToList();
+            otherObjs = otherObjs.Except(allGeoms).Except(objs).Except(objs2).Except(mainObjs).ToList();
             // Add the toolbar
             otherObjs.Insert(0, m_modeller.getToolbars());
             // Add layers
@@ -483,8 +521,7 @@ namespace LusasLookup {
             if (m_modeller.view().existsContoursLayer()) otherObjs.Insert(0, m_modeller.view().getContoursLayer());
             if (m_modeller.view().existsAttributesLayer()) otherObjs.Insert(0, m_modeller.view().getAttributesLayer());
             if (m_modeller.view().existsAnnotationLayer()) otherObjs.Insert(0, m_modeller.view().getAnnotationLayer());
-            // Add modeller
-            otherObjs.Insert(0, m_modeller);
+
             // Add to treeview
             objNode = new TreeNode($"Others ({otherObjs.Count})");
             treeView.Nodes.Add(objNode);
