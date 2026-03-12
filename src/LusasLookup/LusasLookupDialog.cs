@@ -177,8 +177,9 @@ namespace LusasLookup {
                     var getValueUnitsMethod = methods.FirstOrDefault(m => m.Name == "getValueUnits");
                     var getValueMethod = methods.FirstOrDefault(m => m.Name == "getValue");
 
-                    // Read value names
+                    // Read value names (natural sort: numbers ordered numerically, e.g. test6 < test40)
                     string[] savedValueNames = CastObject<string>.arrayFromArrayObject(getValueNamesMethod.GetValue(targetObjs));
+                    savedValueNames = savedValueNames.OrderBy(s => System.Text.RegularExpressions.Regex.Replace(s, @"\d+", m => m.Value.PadLeft(20, '0')), StringComparer.OrdinalIgnoreCase).ToArray();
 
                     foreach (var l_name in savedValueNames) {
                         try {
