@@ -352,6 +352,23 @@ namespace LusasLookup {
                 }
             }
 
+            // Mesh
+            string l_objName = "Mesh Object";
+            List<IFMeshFamily> mesh = new List<IFMeshFamily>();
+            mesh.AddRange(CastObject<IFNode>.arrayFromArrayObject(m_modeller.db().getObjects("Nodes")));
+            mesh.AddRange(CastObject<IFElement>.arrayFromArrayObject(m_modeller.db().getObjects("Elements")));
+            TreeNode objNode = new TreeNode($"{l_objName}s ({mesh.Count})");
+            treeView.Nodes.Add(objNode);
+            foreach (var l_obj in mesh) {
+                string l_name = (l_obj is IFNode? "Node " : "Element ") + l_obj.getName();
+                // Skip if filtered
+                if (searchTerm != "" && l_name.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) < 0) continue;
+
+                TreeNode l_node = new TreeNode(l_name);
+                l_node.Tag = l_obj;
+                objNode.Nodes.Add(l_node);
+            }
+
             // Get all attributes (+utilities)
             IFAttribute[] allAttrs = CastObject<IFAttribute>.arrayFromArrayObject(m_modeller.db().getAttributes_Ext("all"));
 
@@ -475,9 +492,9 @@ namespace LusasLookup {
             }
 
             // Reference Paths
-            string l_objName = "Reference Path";
+            l_objName = "Reference Path";
             IFReferencePath[] objs = CastObject<IFReferencePath>.arrayFromArrayObject(m_modeller.db().getObjects(l_objName));
-            TreeNode objNode = new TreeNode($"{l_objName}s ({objs.Length})");
+            objNode = new TreeNode($"{l_objName}s ({objs.Length})");
             treeView.Nodes.Add(objNode);
             foreach (var l_obj in objs) {
                 string l_name = l_obj.getName();
@@ -488,6 +505,7 @@ namespace LusasLookup {
                 l_node.Tag = l_obj;
                 objNode.Nodes.Add(l_node);
             }
+
             // Inspection Lines
             l_objName = "Beam/Shell Slicing";
             IFBeamShellSlice[] objs2 = CastObject<IFBeamShellSlice>.arrayFromArrayObject(m_modeller.db().getObjects(l_objName));
@@ -505,7 +523,7 @@ namespace LusasLookup {
 
             // Other
             List<object> otherObjs = CastObject<object>.arrayFromArrayObject(m_modeller.db().getObjects("all")).ToList();
-            otherObjs = otherObjs.Except(allGeoms).Except(objs).Except(objs2).Except(mainObjs).ToList();
+            otherObjs = otherObjs.Except(allGeoms).Except(mesh).Except(objs).Except(objs2).Except(mainObjs).ToList();
             // Add the toolbar
             otherObjs.Insert(0, m_modeller.getToolbars());
             // Add layers
