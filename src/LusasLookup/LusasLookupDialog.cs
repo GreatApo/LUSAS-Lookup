@@ -254,7 +254,7 @@ namespace LusasLookup {
                             continue;
                         }
                         double l_volume = elm.getVolume();
-                        if (l_area > 0) {
+                        if (l_volume > 0) {
                             elms3D += 1;
                             elmsVolume += l_volume;
                             continue;
