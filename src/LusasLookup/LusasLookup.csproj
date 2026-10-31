@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <!-- Default LUSAS version; can be overridden by Configuration-specific PropertyGroups or by passing /p:LusasVersion=... -->
-    <LusasVersion>230</LusasVersion>
+    <LusasVersion>240</LusasVersion>
   </PropertyGroup>
   
   <!-- Configuration-based LUSAS version mappings -->
@@ -25,6 +25,9 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug_230' ">
     <LusasVersion>230</LusasVersion>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug_240' ">
+    <LusasVersion>240</LusasVersion>
+  </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release_211' ">
     <LusasVersion>211</LusasVersion>
@@ -34,6 +37,9 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release_230' ">
     <LusasVersion>230</LusasVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release_240' ">
+    <LusasVersion>240</LusasVersion>
   </PropertyGroup>
 
   <!-- Platform setup -->
